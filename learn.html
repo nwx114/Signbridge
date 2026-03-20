@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手语学习 - SignBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .emergency-btn {
+            background-color: #e74c3c;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emergency-btn:hover {
+            background-color: #c0392b !important;
+            color: white !important;
+        }
+
+        /* 主内容 */
+        main {
+            margin-top: 100px;
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 学习进度 */
+        .progress-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-header h2 {
+            color: #2c3e50;
+        }
+
+        .level-badge {
+            background-color: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 10px;
+            width: 65%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* 课程分类 */
+        .categories {
+            margin-bottom: 40px;
+        }
+
+        .categories h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 0.8rem 1.5rem;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-tab.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .category-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 课程列表 */
+        .courses {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 40px;
+        }
+
+        .course-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .course-image {
+            height: 200px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .course-content {
+            padding: 1.5rem;
+        }
+
+        .course-level {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background-color: #e7f3ff;
+            color: #3498db;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .course-card h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .course-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .course-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .course-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* 推荐学习 */
+        .recommended {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .recommended h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .recommended-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recommended-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .recommended-item:hover {
+            transform: translateX(5px);
+        }
+
+        .recommended-icon {
+            font-size: 2rem;
+            min-width: 50px;
+        }
+
+        .recommended-content h3 {
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .recommended-content p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .progress-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .category-tabs {
+                flex-direction: column;
+            }
+
+            .category-tab {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html" class="emergency-btn">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h1>手语学习</h1>
+                <p>系统化学习手语，从基础到高级，提升沟通能力</p>
+            </div>
+
+            <!-- 学习进度 -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <h2>学习进度</h2>
+                    <div class="level-badge">Level 3</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p style="margin-bottom: 1.5rem; font-size: 0.9rem; color: #666;">总体完成度: 65%</p>
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">已完成课程</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">进行中课程</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">45</div>
+                        <div class="stat-label">学习小时</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">准确率</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程分类 -->
+            <div class="categories">
+                <h2>课程分类</h2>
+                <div class="category-tabs">
+                    <div class="category-tab active">全部课程</div>
+                    <div class="category-tab">基础入门</div>
+                    <div class="category-tab">日常生活</div>
+                    <div class="category-tab">职场沟通</div>
+                    <div class="category-tab">紧急情况</div>
+                    <div class="category-tab">高级表达</div>
+                </div>
+
+                <!-- 课程列表 -->
+                <div class="courses">
+                    <div class="course-card">
+                        <div class="course-image">👋</div>
+                        <div class="course-content">
+                            <div class="course-level">基础</div>
+                            <h3>手语基础入门</h3>
+                            <p>学习手语的基本手势和表达方式，掌握日常问候和简单交流</p>
+                            <div class="course-meta">
+                                <span>10课时</span>
+                                <span>初级</span>
+                            </div>
+                            <button class="course-btn">开始学习</button>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div class="course-image">🏠</div>
+                        <div class="course-content">
+                            <div class="course-level">基础</div>
+                            <h3>日常生活用语</h3>
+                            <p>学习日常生活中常用的手语表达，包括家庭、饮食、购物等场景</p>
+                            <div class="course-meta">
+                                <span>15课时</span>
+                                <span>初级</span>
+                            </div>
+                            <button class="course-btn">开始学习</button>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div class="course-image">💼</div>
+                        <div class="course-content">
+                            <div class="course-level">中级</div>
+                            <h3>职场沟通技巧</h3>
+                            <p>学习职场环境中的手语表达，包括会议、汇报、团队合作等场景</p>
+                            <div class="course-meta">
+                                <span>12课时</span>
+                                <span>中级</span>
+                            </div>
+                            <button class="course-btn">开始学习</button>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div class="course-image">🚨</div>
+                        <div class="course-content">
+                            <div class="course-level">中级</div>
+                            <h3>紧急情况表达</h3>
+                            <p>学习紧急情况下的手语表达，包括求助、医疗、安全等场景</p>
+                            <div class="course-meta">
+                                <span>8课时</span>
+                                <span>中级</span>
+                            </div>
+                            <button class="course-btn">开始学习</button>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div class="course-image">🎓</div>
+                        <div class="course-content">
+                            <div class="course-level">高级</div>
+                            <h3>高级表达技巧</h3>
+                            <p>学习复杂的手语表达，包括抽象概念、情感表达、故事讲述等</p>
+                            <div class="course-meta">
+                                <span>18课时</span>
+                                <span>高级</span>
+                            </div>
+                            <button class="course-btn">开始学习</button>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div class="course-image">🌍</div>
+                        <div class="course-content">
+                            <div class="course-level">高级</div>
+                            <h3>手语文化与历史</h3>
+                            <p>了解手语的文化背景和历史发展，深入理解手语的社会意义</p>
+                            <div class="course-meta">
+                                <span>10课时</span>
+                                <span>高级</span>
+                            </div>
+                            <button class="course-btn">开始学习</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 推荐学习 -->
+            <div class="recommended">
+                <h2>推荐学习</h2>
+                <div class="recommended-list">
+                    <div class="recommended-item">
+                        <div class="recommended-icon">📚</div>
+                        <div class="recommended-content">
+                            <h3>每日手语练习</h3>
+                            <p>每天10分钟，保持手语熟练度</p>
+                        </div>
+                    </div>
+                    <div class="recommended-item">
+                        <div class="recommended-icon">🎯</div>
+                        <div class="recommended-content">
+                            <h3>手语挑战</h3>
+                            <p>参与每周手语挑战，提升技能</p>
+                        </div>
+                    </div>
+                    <div class="recommended-item">
+                        <div class="recommended-icon">👥</div>
+                        <div class="recommended-content">
+                            <h3>学习社区</h3>
+                            <p>加入学习社区，与其他学习者交流</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 课程分类标签切换
+        document.addEventListener('DOMContentLoaded', function () {
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    // 移除所有标签的active类
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    // 添加当前标签的active类
+                    this.classList.add('active');
+
+                    // 模拟课程过滤
+                    alert('已切换到"' + this.textContent + '"分类');
+                });
+            });
+
+            // 课程按钮点击事件
+            const courseBtns = document.querySelectorAll('.course-btn');
+            courseBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const courseTitle = this.closest('.course-card').querySelector('h3').textContent;
+                    alert('开始学习: ' + courseTitle);
+                });
+            });
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
