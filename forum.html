@@ -1051,6 +1051,7 @@
                                     <button class="action-btn">👍 点赞 (28)</button>
                                     <button class="action-btn">💬 回复</button>
                                     <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
                                 </div>
                             </div>
                         </div>
@@ -1078,6 +1079,7 @@
                                     <button class="action-btn">👍 点赞 (19)</button>
                                     <button class="action-btn">💬 回复</button>
                                     <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
                                 </div>
                             </div>
                         </div>
@@ -1105,6 +1107,7 @@
                                     <button class="action-btn">👍 点赞 (31)</button>
                                     <button class="action-btn">💬 回复</button>
                                     <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
                                 </div>
                             </div>
                         </div>
@@ -1132,6 +1135,7 @@
                                     <button class="action-btn">👍 点赞 (22)</button>
                                     <button class="action-btn">💬 回复</button>
                                     <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
                                 </div>
                             </div>
                         </div>
@@ -1161,7 +1165,7 @@
             </div>
 
             <div class="auto-fill-info">
-                <p><strong>作者:</strong> <span id="postAuthor">张三</span></p>
+                <p><strong>作者:</strong> <span id="postAuthor">加载中...</span></p>
                 <p><strong>发布时间:</strong> <span id="postTime">自动获取</span></p>
             </div>
 
@@ -1350,6 +1354,14 @@
 
             // 打开模态框
             postBtn.addEventListener('click', function () {
+                // 获取当前登录用户信息
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user && user.username) {
+                    postAuthor.textContent = user.username;
+                } else {
+                    postAuthor.textContent = '游客';
+                }
+
                 // 更新发布时间
                 const now = new Date();
                 const timeString = now.getFullYear() + '-' +
@@ -1428,23 +1440,130 @@
             });
 
             // 分类点击
+            let currentCategory = null;
+            let filteredPosts = [];
+
             const categoryLinks = document.querySelectorAll('.category-item a');
             categoryLinks.forEach(link => {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
-                    const category = this.querySelector('span').textContent;
-                    alert('切换到"' + category + '"分类');
+                    const categoryName = this.querySelector('span').textContent.trim();
+
+                    // 如果点击的是当前分类，则取消筛选
+                    if (currentCategory === categoryName) {
+                        currentCategory = null;
+                        this.style.fontWeight = 'normal';
+                        this.style.color = '';
+                    } else {
+                        // 更新当前分类
+                        currentCategory = categoryName;
+
+                        // 更新分类链接的样式
+                        categoryLinks.forEach(l => {
+                            l.style.fontWeight = 'normal';
+                            l.style.color = '';
+                        });
+                        this.style.fontWeight = 'bold';
+                        this.style.color = '#3498db';
+                    }
+
+                    // 筛选帖子
+                    filterPostsByCategory();
+
+                    // 显示第一页
+                    showPage(1);
                 });
             });
+
+            // 根据分类筛选帖子
+            function filterPostsByCategory() {
+                if (currentCategory) {
+                    filteredPosts = allPosts.filter(post => {
+                        return post.category === '分类: ' + currentCategory;
+                    });
+                } else {
+                    filteredPosts = allPosts;
+                }
+            }
 
             // 热门话题点击
             const topicLinks = document.querySelectorAll('.topic-item a');
             topicLinks.forEach(link => {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
-                    alert('打开话题: ' + this.textContent);
+                    const topicTitle = this.textContent.trim();
+
+                    // 查找对应的帖子
+                    const postItems = document.querySelectorAll('.post-item');
+                    let targetPost = null;
+
+                    postItems.forEach(post => {
+                        const postTitle = post.querySelector('.post-title a').textContent.trim();
+
+                        // 清理标题用于比较（移除标点符号和空格）
+                        const cleanTopicTitle = topicTitle.replace(/[？。！，、\s]/g, '');
+                        const cleanPostTitle = postTitle.replace(/[？。！，、\s]/g, '');
+
+                        // 多种匹配方式
+                        const isMatch =
+                            postTitle === topicTitle || // 完全匹配
+                            postTitle.includes(topicTitle) || // 帖子标题包含话题标题
+                            topicTitle.includes(postTitle) || // 话题标题包含帖子标题
+                            cleanPostTitle.includes(cleanTopicTitle) || // 清理后匹配
+                            cleanTopicTitle.includes(cleanPostTitle) ||
+                            // 相似度匹配（计算共同字符比例）
+                            calculateSimilarity(cleanPostTitle, cleanTopicTitle) > 0.6;
+
+                        if (isMatch) {
+                            targetPost = post;
+                        }
+                    });
+
+                    if (targetPost) {
+                        // 滚动到对应帖子
+                        targetPost.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // 高亮显示帖子
+                        targetPost.style.backgroundColor = '#e3f2fd';
+                        targetPost.style.transition = 'background-color 0.5s ease';
+
+                        // 3秒后恢复原始背景色
+                        setTimeout(() => {
+                            targetPost.style.backgroundColor = '';
+                        }, 3000);
+
+                        // 打开帖子详情
+                        setTimeout(() => {
+                            openPostDetail(targetPost);
+                        }, 500);
+                    } else {
+                        alert('未找到对应的话题帖子: ' + topicTitle);
+                    }
                 });
             });
+
+            // 计算字符串相似度（Levenshtein距离简化版）
+            function calculateSimilarity(str1, str2) {
+                const longer = str1.length > str2.length ? str1 : str2;
+                const shorter = str1.length > str2.length ? str2 : str1;
+
+                if (longer.length === 0) return 1.0;
+
+                // 计算共同字符数
+                let commonChars = 0;
+                const shorterChars = shorter.split('');
+                const longerChars = longer.split('');
+
+                for (let char of shorterChars) {
+                    const index = longerChars.indexOf(char);
+                    if (index !== -1) {
+                        commonChars++;
+                        longerChars.splice(index, 1);
+                    }
+                }
+
+                return commonChars / longer.length;
+            }
 
             // 帖子标题点击
             const postLinks = document.querySelectorAll('.post-title a');
@@ -1460,8 +1579,18 @@
             const actionBtns = document.querySelectorAll('.action-btn');
             actionBtns.forEach(btn => {
                 btn.addEventListener('click', function () {
+                    // 检测是否是删除按钮
+                    if (this.textContent.includes('🗑️ 删除') || this.innerHTML.includes('🗑️')) {
+                        // 删除帖子
+                        const postItem = this.closest('.post-item');
+                        const postTitle = postItem.querySelector('.post-title a').textContent;
+                        const postData = allPosts.find(post => post.title === postTitle);
+                        if (postData) {
+                            deletePost(postData, postItem);
+                        }
+                    }
                     // 检测是否是点赞按钮
-                    if (this.textContent.includes('👍 点赞') || this.innerHTML.includes('👍')) {
+                    else if (this.textContent.includes('👍 点赞') || this.innerHTML.includes('👍')) {
                         // 获取当前点赞数
                         const text = this.textContent;
                         const match = text.match(/\((\d+)\)/);
@@ -1768,9 +1897,12 @@
                     String(now.getMinutes()).padStart(2, '0') + ':' +
                     String(now.getSeconds()).padStart(2, '0');
 
-                // 使用当前登录用户的作者信息（这里使用张三作为默认值）
+                // 获取当前登录用户的作者信息
+                const user = JSON.parse(localStorage.getItem('user'));
+                const author = user && user.username ? user.username : '游客';
+
                 const replyData = {
-                    author: '张三',
+                    author: author,
                     time: timeString,
                     content: content
                 };
@@ -1851,7 +1983,15 @@
 
             // 初始化帖子数据
             function initPosts() {
-                // 收集所有帖子
+                // 首先从localStorage加载已保存的帖子
+                const savedPosts = localStorage.getItem('forumPosts');
+                if (savedPosts) {
+                    const parsedPosts = JSON.parse(savedPosts);
+                    // 将保存的帖子添加到allPosts数组
+                    allPosts = parsedPosts;
+                }
+
+                // 收集HTML中的初始帖子（避免重复）
                 const postItems = document.querySelectorAll('.post-item');
                 postItems.forEach(item => {
                     // 提取帖子信息
@@ -1883,18 +2023,22 @@
                     const likeCount = likeBtn ? likeBtn.textContent.match(/\((\d+)\)/) : null;
                     const likes = likeCount ? likeCount[1] : '0';
 
-                    // 存储帖子数据
-                    allPosts.push({
-                        title,
-                        content,
-                        author,
-                        time,
-                        category,
-                        views,
-                        replies,
-                        likes,
-                        element: item
-                    });
+                    // 检查是否已存在相同标题的帖子
+                    const exists = allPosts.some(post => post.title === title);
+                    if (!exists) {
+                        // 存储帖子数据
+                        allPosts.push({
+                            title,
+                            content,
+                            author,
+                            time,
+                            category,
+                            views,
+                            replies,
+                            likes,
+                            element: item
+                        });
+                    }
                 });
 
                 // 按发布时间排序（假设时间格式为 YYYY-MM-DD）
@@ -1904,8 +2048,21 @@
                     return dateB - dateA; // 降序排列，最新的在前
                 });
 
+                // 保存到localStorage
+                savePostsToStorage();
+
                 // 显示第一页
                 showPage(1);
+            }
+
+            // 保存帖子到localStorage
+            function savePostsToStorage() {
+                // 移除element属性，因为DOM元素不能被序列化
+                const postsToSave = allPosts.map(post => {
+                    const { element, ...postWithoutElement } = post;
+                    return postWithoutElement;
+                });
+                localStorage.setItem('forumPosts', JSON.stringify(postsToSave));
             }
 
             // 显示指定页码的帖子
@@ -1916,10 +2073,13 @@
                 const postsContainer = document.querySelector('.posts');
                 postsContainer.innerHTML = '';
 
+                // 使用筛选后的帖子（如果没有筛选则使用全部帖子）
+                const postsToShow = filteredPosts.length > 0 || currentCategory ? filteredPosts : allPosts;
+
                 // 计算当前页的帖子范围
                 const startIndex = (page - 1) * pageSize;
                 const endIndex = startIndex + pageSize;
-                const pagePosts = allPosts.slice(startIndex, endIndex);
+                const pagePosts = postsToShow.slice(startIndex, endIndex);
 
                 // 显示当前页的帖子
                 if (pagePosts.length > 0) {
@@ -1950,6 +2110,7 @@
                                     <button class="action-btn">👍 点赞 (${postData.likes})</button>
                                     <button class="action-btn">💬 回复</button>
                                     <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
                                 </div>
                             </div>
                         `;
@@ -1964,7 +2125,10 @@
                         const actionBtns = postElement.querySelectorAll('.action-btn');
                         actionBtns.forEach(btn => {
                             btn.addEventListener('click', function () {
-                                if (this.textContent.includes('👍 点赞') || this.innerHTML.includes('👍')) {
+                                if (this.textContent.includes('🗑️ 删除') || this.innerHTML.includes('🗑️')) {
+                                    // 删除帖子
+                                    deletePost(postData, postElement);
+                                } else if (this.textContent.includes('👍 点赞') || this.innerHTML.includes('👍')) {
                                     const text = this.textContent;
                                     const match = text.match(/\((\d+)\)/);
                                     let count = match ? parseInt(match[1]) : 0;
@@ -2004,7 +2168,8 @@
             // 更新分页按钮状态
             function updatePagination() {
                 const paginationContainer = document.querySelector('.pagination');
-                const totalPages = Math.ceil(allPosts.length / pageSize);
+                const postsToShow = filteredPosts.length > 0 || currentCategory ? filteredPosts : allPosts;
+                const totalPages = Math.ceil(postsToShow.length / pageSize);
 
                 // 清空现有分页按钮
                 paginationContainer.innerHTML = '';
@@ -2056,12 +2221,47 @@
                 // 将新帖子添加到数组开头
                 allPosts.unshift(postData);
 
+                // 保存到localStorage
+                savePostsToStorage();
+
                 // 重新显示第一页
                 showPage(1);
             }
 
+            // 删除帖子
+            function deletePost(postData, postElement) {
+                // 要求输入密码
+                const password = prompt('请输入删除密码（默认密码：123）：');
+
+                if (password === '123') {
+                    // 密码正确，删除帖子
+                    if (confirm('确定要删除这个帖子吗？此操作不可恢复。')) {
+                        // 从allPosts数组中删除
+                        const index = allPosts.findIndex(post => post.title === postData.title);
+                        if (index > -1) {
+                            allPosts.splice(index, 1);
+
+                            // 保存到localStorage
+                            savePostsToStorage();
+
+                            // 重新显示当前页
+                            showPage(currentPage);
+
+                            // 显示成功提示
+                            alert('帖子删除成功！');
+                        }
+                    }
+                } else if (password !== null) {
+                    // 密码错误
+                    alert('密码错误，无法删除帖子！');
+                }
+            }
+
             // 初始化帖子数据
             initPosts();
+
+            // 初始化筛选后的帖子
+            filteredPosts = allPosts;
         });
     </script>
     <script src="script.js"></script>

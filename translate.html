@@ -418,7 +418,7 @@
             </div>
 
             <!-- 历史记录 -->
-            <div class="history-section">
+            <div class="history-section" id="history-section">
                 <h2>翻译历史</h2>
                 <div class="history-list">
                     <div class="history-item">
@@ -477,6 +477,20 @@
     <script>
         // 摄像头功能实现
         document.addEventListener('DOMContentLoaded', function () {
+            // 检查URL中是否有hash，如果有就滚动到对应位置
+            if (window.location.hash) {
+                const targetId = window.location.hash.substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    setTimeout(() => {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }, 100);
+                }
+            }
+
             const startBtn = document.getElementById('start-btn');
             const stopBtn = document.getElementById('stop-btn');
             const cameraFeed = document.getElementById('camera-feed');
