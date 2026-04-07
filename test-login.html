@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +12,14 @@
             margin: 0 auto;
             padding: 20px;
         }
+
         .test-section {
             margin: 20px 0;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+
         button {
             padding: 10px 20px;
             margin: 5px;
@@ -24,9 +27,22 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .success { background-color: #4CAF50; color: white; }
-        .info { background-color: #2196F3; color: white; }
-        .warning { background-color: #ff9800; color: white; }
+
+        .success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .info {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .warning {
+            background-color: #ff9800;
+            color: white;
+        }
+
         .result {
             margin-top: 10px;
             padding: 10px;
@@ -35,39 +51,40 @@
         }
     </style>
 </head>
+
 <body>
     <h1>登录功能测试</h1>
-    
+
     <div class="test-section">
         <h2>测试1: 注册新用户</h2>
         <button class="success" onclick="testRegister()">注册测试用户</button>
         <div class="result" id="registerResult"></div>
     </div>
-    
+
     <div class="test-section">
         <h2>测试2: 登录用户</h2>
         <button class="info" onclick="testLogin()">登录测试用户</button>
         <div class="result" id="loginResult"></div>
     </div>
-    
+
     <div class="test-section">
         <h2>测试3: 退出登录</h2>
         <button class="warning" onclick="testLogout()">退出登录</button>
         <div class="result" id="logoutResult"></div>
     </div>
-    
+
     <div class="test-section">
         <h2>测试4: 再次登录（验证反复登录功能）</h2>
         <button class="info" onclick="testLoginAgain()">再次登录测试用户</button>
         <div class="result" id="loginAgainResult"></div>
     </div>
-    
+
     <div class="test-section">
         <h2>测试5: 查看存储的用户数据</h2>
         <button class="info" onclick="showUserData()">查看用户数据</button>
         <div class="result" id="userDataResult"></div>
     </div>
-    
+
     <div class="test-section">
         <h2>测试6: 清除所有测试数据</h2>
         <button class="warning" onclick="clearTestData()">清除测试数据</button>
@@ -78,14 +95,14 @@
         // 模拟注册函数
         function testRegister() {
             const users = JSON.parse(localStorage.getItem('users')) || [];
-            
+
             // 检查测试用户是否已存在
             const existingUser = users.find(u => u.username === 'testuser');
             if (existingUser) {
                 document.getElementById('registerResult').innerHTML = '<strong>测试用户已存在</strong>';
                 return;
             }
-            
+
             // 创建测试用户
             const testUser = {
                 id: Date.now().toString(),
@@ -97,19 +114,19 @@
                 learningHours: 0,
                 bio: ''
             };
-            
+
             // 保存用户
             users.push(testUser);
             localStorage.setItem('users', JSON.stringify(users));
-            
+
             document.getElementById('registerResult').innerHTML = '<strong>注册成功！</strong><br>用户名: testuser<br>密码: test123';
         }
-        
+
         // 模拟登录函数
         function testLogin() {
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const user = users.find(u => u.username === 'testuser' && u.password === 'test123');
-            
+
             if (user) {
                 localStorage.setItem('user', JSON.stringify(user));
                 document.getElementById('loginResult').innerHTML = '<strong>登录成功！</strong><br>当前用户: ' + user.username;
@@ -117,18 +134,18 @@
                 document.getElementById('loginResult').innerHTML = '<strong>登录失败！</strong><br>请先注册测试用户';
             }
         }
-        
+
         // 模拟退出登录函数
         function testLogout() {
             localStorage.removeItem('user');
             document.getElementById('logoutResult').innerHTML = '<strong>已退出登录</strong>';
         }
-        
+
         // 测试再次登录
         function testLoginAgain() {
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const user = users.find(u => u.username === 'testuser' && u.password === 'test123');
-            
+
             if (user) {
                 localStorage.setItem('user', JSON.stringify(user));
                 document.getElementById('loginAgainResult').innerHTML = '<strong>再次登录成功！</strong><br>当前用户: ' + user.username;
@@ -136,28 +153,28 @@
                 document.getElementById('loginAgainResult').innerHTML = '<strong>登录失败！</strong><br>请先注册测试用户';
             }
         }
-        
+
         // 显示用户数据
         function showUserData() {
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const currentUser = JSON.parse(localStorage.getItem('user'));
-            
+
             let html = '<strong>存储的用户数据：</strong><br>';
             html += '<strong>所有用户：</strong><br>';
             users.forEach(user => {
                 html += `用户名: ${user.username}, 邮箱: ${user.email}<br>`;
             });
-            
+
             html += '<br><strong>当前登录用户：</strong><br>';
             if (currentUser) {
                 html += `用户名: ${currentUser.username}, 邮箱: ${currentUser.email}`;
             } else {
                 html += '未登录';
             }
-            
+
             document.getElementById('userDataResult').innerHTML = html;
         }
-        
+
         // 清除测试数据
         function clearTestData() {
             localStorage.removeItem('users');
@@ -166,4 +183,5 @@
         }
     </script>
 </body>
+
 </html>

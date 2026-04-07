@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 绑定导航菜单事件（页面加载时）
     bindNavMenuEvents();
+
+    // 初始化页面跳转跟踪
+    initPageNavigationTracking();
 });
 
 // 平滑滚动功能
@@ -843,6 +846,12 @@ function updateUIForLoggedIn(user) {
         // 从数据库加载个人信息并填充表单
         loadPersonalInfoToForm(user.id);
 
+        // 更新学习进度显示
+        updateProfileLearningProgress(user.id);
+
+        // 更新最近活动显示
+        updateRecentActivities(user.id);
+
         // 重新绑定导航菜单事件（无论是否重新创建布局都执行）
         bindNavMenuEvents();
     }
@@ -1433,4 +1442,296 @@ function getPersonalInfoFromDatabase(userId) {
     } else {
         return personalData['temp'] || null;
     }
+}
+
+// 保存学习进度到数据库
+function saveLearningProgressToDatabase(userId, progress) {
+    // 从localStorage获取学习进度数据库
+    const learningProgressData = JSON.parse(localStorage.getItem('learningProgress')) || {};
+
+    // 保存或更新用户学习进度
+    if (userId) {
+        learningProgressData[userId] = progress;
+    } else {
+        // 如果没有用户ID，使用临时存储
+        learningProgressData['temp'] = progress;
+    }
+
+    // 保存到localStorage
+    localStorage.setItem('learningProgress', JSON.stringify(learningProgressData));
+}
+
+// 从数据库获取学习进度
+function getLearningProgressFromDatabase(userId) {
+    // 从localStorage获取学习进度数据库
+    const learningProgressData = JSON.parse(localStorage.getItem('learningProgress')) || {};
+
+    // 返回指定用户的学习进度
+    if (userId) {
+        return learningProgressData[userId] || resetLearningProgress();
+    } else {
+        // 如果没有用户ID，返回临时存储的进度
+        return learningProgressData['temp'] || resetLearningProgress();
+    }
+}
+
+// 重置学习进度为零
+function resetLearningProgress() {
+    return {
+        totalProgress: 0,
+        level: 1,
+        completedCourses: 0,
+        learningHours: 0,
+        courses: {
+            '手语基础入门': 0,
+            '日常生活用语': 0,
+            '职场沟通技巧': 0,
+            '紧急情况表达': 0,
+            '高级表达技巧': 0,
+            '手语文化与历史': 0
+        }
+    };
+}
+
+// 初始化学习进度
+function initLearningProgress() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 获取当前进度，如果不存在则重置为零
+    const progress = getLearningProgressFromDatabase(userId);
+
+    // 保存重置后的进度
+    saveLearningProgressToDatabase(userId, progress);
+
+    return progress;
+}
+
+// 更新学习进度
+function updateLearningProgress(courseName, progress) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 获取当前进度
+    const currentProgress = getLearningProgressFromDatabase(userId);
+
+    // 更新课程进度
+    if (currentProgress.courses[courseName] !== undefined) {
+        currentProgress.courses[courseName] = progress;
+    }
+
+    // 计算总进度
+    const courseCount = Object.keys(currentProgress.courses).length;
+    const totalProgress = Object.values(currentProgress.courses).reduce((sum, val) => sum + val, 0) / courseCount;
+    currentProgress.totalProgress = Math.round(totalProgress);
+
+    // 更新已完成课程数
+    currentProgress.completedCourses = Object.values(currentProgress.courses).filter(val => val === 100).length;
+
+    // 保存更新后的进度
+    saveLearningProgressToDatabase(userId, currentProgress);
+
+    return currentProgress;
+}
+
+// 重置学习进度
+function resetLearningProgress() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 创建初始进度对象
+    const initialProgress = {
+        totalProgress: 0,
+        completedCourses: 0,
+        learningHours: 0,
+        level: 1,
+        courses: {
+            '手语基础入门': 0,
+            '日常生活用语': 0,
+            '职场沟通技巧': 0,
+            '紧急情况表达': 0,
+            '高级表达技巧': 0,
+            '手语文化与历史': 0
+        },
+        lastUpdated: new Date().toISOString()
+    };
+
+    // 保存重置后的进度
+    saveLearningProgressToDatabase(userId, initialProgress);
+
+    return initialProgress;
+}
+
+// 更新学习小时数
+function updateLearningHours(hours) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 获取当前进度
+    const currentProgress = getLearningProgressFromDatabase(userId);
+
+    // 更新学习小时数
+    currentProgress.learningHours += hours;
+
+    // 保存更新后的进度
+    saveLearningProgressToDatabase(userId, currentProgress);
+
+    return currentProgress;
+}
+
+// 更新个人中心学习进度显示
+function updateProfileLearningProgress(userId) {
+    // 获取学习进度
+    const progress = getLearningProgressFromDatabase(userId);
+
+    // 找到个人中心的进度显示区域
+    const progressSection = document.getElementById('profileProgressSection');
+    if (!progressSection) return;
+
+    // 清空现有内容
+    progressSection.innerHTML = '';
+
+    // 为每个课程创建进度条
+    Object.entries(progress.courses).forEach(([courseName, courseProgress]) => {
+        const progressItem = document.createElement('div');
+        progressItem.className = 'progress-item';
+        progressItem.innerHTML = `
+            <div class="progress-info">
+                <span>${courseName}</span>
+                <span>${courseProgress}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${courseProgress}%;"></div>
+            </div>
+        `;
+        progressSection.appendChild(progressItem);
+    });
+}
+
+// 保存活动记录到数据库
+function saveActivityRecord(userId, activity) {
+    // 从localStorage获取活动记录数据库
+    const activityData = JSON.parse(localStorage.getItem('activityData')) || {};
+
+    // 获取用户的活动记录
+    let userActivities = activityData[userId] || [];
+
+    // 添加新活动到记录开头
+    userActivities.unshift(activity);
+
+    // 限制记录数量不超过3条
+    if (userActivities.length > 3) {
+        userActivities = userActivities.slice(0, 3);
+    }
+
+    // 保存更新后的活动记录
+    activityData[userId] = userActivities;
+    localStorage.setItem('activityData', JSON.stringify(activityData));
+}
+
+// 从数据库获取活动记录
+function getActivityRecords(userId) {
+    // 从localStorage获取活动记录数据库
+    const activityData = JSON.parse(localStorage.getItem('activityData')) || {};
+
+    // 返回用户的活动记录
+    return activityData[userId] || [];
+}
+
+// 记录页面跳转活动
+function recordPageNavigation(fromPage, toPage) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    if (!userId) return;
+
+    // 页面名称映射
+    const pageNames = {
+        'index.html': '首页',
+        'translate.html': '实时翻译',
+        'learn.html': '手语学习',
+        'forum.html': '手语论坛',
+        'emergency.html': '紧急求助',
+        'profile.html': '个人中心'
+    };
+
+    // 获取友好的页面名称
+    const fromPageName = pageNames[fromPage] || fromPage;
+    const toPageName = pageNames[toPage] || toPage;
+
+    // 创建活动记录
+    const activity = {
+        type: '页面跳转',
+        title: `从 ${fromPageName} 跳转到 ${toPageName}`,
+        time: new Date().toISOString().replace('T', ' ').slice(0, 19)
+    };
+
+    // 保存活动记录
+    saveActivityRecord(userId, activity);
+}
+
+// 更新个人中心最近活动显示
+function updateRecentActivities(userId) {
+    // 获取活动记录
+    const activities = getActivityRecords(userId);
+
+    // 找到最近活动显示区域
+    const activityList = document.querySelector('.activity-list');
+    if (!activityList) return;
+
+    // 清空现有内容
+    activityList.innerHTML = '';
+
+    // 如果没有活动记录，显示提示信息
+    if (activities.length === 0) {
+        const noActivityItem = document.createElement('li');
+        noActivityItem.className = 'activity-item';
+        noActivityItem.innerHTML = `
+            <div class="activity-icon">📋</div>
+            <div class="activity-content">
+                <div class="activity-title">暂无活动记录</div>
+                <div class="activity-time">-</div>
+            </div>
+        `;
+        activityList.appendChild(noActivityItem);
+        return;
+    }
+
+    // 为每条活动记录创建列表项
+    activities.forEach(activity => {
+        const activityItem = document.createElement('li');
+        activityItem.className = 'activity-item';
+
+        // 根据活动类型选择图标
+        let icon = '📋';
+        if (activity.type === '页面跳转') icon = '🔗';
+        else if (activity.type === '课程学习') icon = '📚';
+        else if (activity.type === '翻译') icon = '🔄';
+        else if (activity.type === '论坛') icon = '💬';
+
+        activityItem.innerHTML = `
+            <div class="activity-icon">${icon}</div>
+            <div class="activity-content">
+                <div class="activity-title">${activity.title}</div>
+                <div class="activity-time">${activity.time}</div>
+            </div>
+        `;
+        activityList.appendChild(activityItem);
+    });
+}
+
+// 监听页面跳转
+function initPageNavigationTracking() {
+    // 监听所有链接点击
+    document.addEventListener('click', function (e) {
+        const target = e.target.closest('a');
+        if (target && target.href) {
+            // 获取当前页面和目标页面
+            const fromPage = window.location.pathname.split('/').pop() || 'index.html';
+            const toPage = new URL(target.href).pathname.split('/').pop() || 'index.html';
+
+            // 记录页面跳转
+            recordPageNavigation(fromPage, toPage);
+        }
+    });
 }

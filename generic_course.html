@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通用课程 - SignBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        /* 主要内容 */
+        main {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+
+        .course-header {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .course-header h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .course-header p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 课程内容 */
+        .course-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .lesson-section {
+            margin-bottom: 3rem;
+        }
+
+        .lesson-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+
+        .lesson-item {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .lesson-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .lesson-item h3 {
+            color: #3498db;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .lesson-item p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .sign-example {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sign-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .sign-description {
+            flex: 1;
+        }
+
+        .sign-description h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .sign-description p {
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        /* 进度跟踪 */
+        .progress-section {
+            background-color: #f9f9f9;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .progress-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-section h3 {
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #34495e;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .footer-content {
+                flex-direction: column;
+            }
+
+            .footer-section {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main>
+        <div class="container">
+            <!-- 课程头部 -->
+            <div class="course-header">
+                <h1>通用课程</h1>
+                <p>学习手语的相关知识和技能，提高沟通能力</p>
+            </div>
+
+            <!-- 课程内容 -->
+            <div class="course-content">
+                <!-- 第一课时：课程介绍 -->
+                <div class="lesson-section">
+                    <h2>第一课时：课程介绍</h2>
+                    <div class="lesson-item">
+                        <h3>课程概述</h3>
+                        <p>本课程将帮助您学习手语的基本概念和表达方式，提高与聋人朋友的沟通能力。</p>
+
+                        <div class="sign-example">
+                            <div class="sign-icon">📚</div>
+                            <div class="sign-description">
+                                <h4>学习</h4>
+                                <p>右手模拟翻书的动作</p>
+                            </div>
+                        </div>
+
+                        <div class="sign-example">
+                            <div class="sign-icon">🗣️</div>
+                            <div class="sign-description">
+                                <h4>沟通</h4>
+                                <p>双手张开，模拟对话的动作</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 第二课时：基本手势 -->
+                <div class="lesson-section">
+                    <h2>第二课时：基本手势</h2>
+                    <div class="lesson-item">
+                        <h3>常用手势</h3>
+                        <p>学习日常生活中常用的手势，如问候、感谢、道歉等。</p>
+
+                        <div class="sign-example">
+                            <div class="sign-icon">👋</div>
+                            <div class="sign-description">
+                                <h4>你好</h4>
+                                <p>右手伸出，手掌向外，轻轻挥动</p>
+                            </div>
+                        </div>
+
+                        <div class="sign-example">
+                            <div class="sign-icon">🙏</div>
+                            <div class="sign-description">
+                                <h4>谢谢</h4>
+                                <p>双手合十，微微点头</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 第三课时：实践练习 -->
+                <div class="lesson-section">
+                    <h2>第三课时：实践练习</h2>
+                    <div class="lesson-item">
+                        <h3>实际应用</h3>
+                        <p>通过实际场景练习，巩固所学的手语知识。</p>
+
+                        <div class="sign-example">
+                            <div class="sign-icon">👥</div>
+                            <div class="sign-description">
+                                <h4>对话</h4>
+                                <p>双手张开，模拟与他人对话的动作</p>
+                            </div>
+                        </div>
+
+                        <div class="sign-example">
+                            <div class="sign-icon">🎯</div>
+                            <div class="sign-description">
+                                <h4>练习</h4>
+                                <p>右手握拳，向上举起</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 进度跟踪 -->
+                <div class="progress-section">
+                    <h3>学习进度</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%;"></div>
+                    </div>
+                    <div class="progress-text">已完成 20%，还需学习 4 课时</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function () {
+            // 初始化学习进度
+            initLearningProgress();
+
+            // 更新学习进度显示
+            const progress = getLearningProgressFromDatabase();
+            updateLearningProgressDisplay(progress);
+
+        });
+
+        // 初始化学习进度
+        function initLearningProgress() {
+            const progress = getLearningProgressFromDatabase();
+            if (!progress) {
+                const initialProgress = {
+                    totalProgress: 0,
+                    courses: {
+                        '手语基础入门': 0,
+                        '日常生活用语': 0,
+                        '职场沟通技巧': 0,
+                        '紧急情况表达': 0,
+                        '高级表达技巧': 0,
+                        '手语文化与历史': 0
+                    },
+                    lastUpdated: new Date().toISOString()
+                };
+                saveLearningProgressToDatabase(initialProgress);
+            }
+        }
+
+        // 从数据库获取学习进度
+        function getLearningProgressFromDatabase() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            const learningProgressData = JSON.parse(localStorage.getItem('learningProgress')) || {};
+            return learningProgressData[userId] || {
+                totalProgress: 0,
+                courses: {},
+                lastUpdated: new Date().toISOString()
+            };
+        }
+
+        // 保存学习进度到数据库
+        function saveLearningProgressToDatabase(progress) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            const learningProgressData = JSON.parse(localStorage.getItem('learningProgress')) || {};
+            learningProgressData[userId] = progress;
+            localStorage.setItem('learningProgress', JSON.stringify(learningProgressData));
+        }
+
+        // 更新学习进度
+        function updateLearningProgress(courseTitle, progress) {
+            const currentProgress = getLearningProgressFromDatabase();
+            currentProgress.courses[courseTitle] = progress;
+
+            // 计算总进度
+            const courseCount = Object.keys(currentProgress.courses).length;
+            if (courseCount > 0) {
+                const totalProgress = Object.values(currentProgress.courses).reduce((sum, val) => sum + val, 0) / courseCount;
+                currentProgress.totalProgress = Math.round(totalProgress);
+            }
+
+            currentProgress.lastUpdated = new Date().toISOString();
+            saveLearningProgressToDatabase(currentProgress);
+        }
+
+        // 更新学习进度显示
+        function updateLearningProgressDisplay(progress) {
+            const progressFill = document.querySelector('.progress-fill');
+            const progressText = document.querySelector('.progress-text');
+
+            if (progressFill) {
+                progressFill.style.width = progress.totalProgress + '%';
+            }
+
+            if (progressText) {
+                const completedLessons = Math.floor(progress.totalProgress / 20);
+                const totalLessons = 5;
+                progressText.textContent = `已完成 ${progress.totalProgress}%，还需学习 ${totalLessons - completedLessons} 课时`;
+            }
+        }
+    </script>
+</body>
+
+</html>

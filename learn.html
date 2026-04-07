@@ -176,6 +176,10 @@
             color: #666;
         }
 
+        #resetProgressBtn:hover {
+            background-color: #c0392b;
+        }
+
         /* 课程分类 */
         .categories {
             margin-bottom: 40px;
@@ -468,6 +472,10 @@
                         <div class="stat-label">准确率</div>
                     </div>
                 </div>
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button id="resetProgressBtn"
+                        style="background-color: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s ease;">重置学习进度</button>
+                </div>
             </div>
 
             <!-- 课程分类 -->
@@ -484,7 +492,7 @@
 
                 <!-- 课程列表 -->
                 <div class="courses">
-                    <div class="course-card">
+                    <div class="course-card" data-category="基础入门">
                         <div class="course-image">👋</div>
                         <div class="course-content">
                             <div class="course-level">基础</div>
@@ -497,7 +505,7 @@
                             <button class="course-btn">开始学习</button>
                         </div>
                     </div>
-                    <div class="course-card">
+                    <div class="course-card" data-category="日常生活">
                         <div class="course-image">🏠</div>
                         <div class="course-content">
                             <div class="course-level">基础</div>
@@ -510,7 +518,7 @@
                             <button class="course-btn">开始学习</button>
                         </div>
                     </div>
-                    <div class="course-card">
+                    <div class="course-card" data-category="职场沟通">
                         <div class="course-image">💼</div>
                         <div class="course-content">
                             <div class="course-level">中级</div>
@@ -523,7 +531,7 @@
                             <button class="course-btn">开始学习</button>
                         </div>
                     </div>
-                    <div class="course-card">
+                    <div class="course-card" data-category="紧急情况">
                         <div class="course-image">🚨</div>
                         <div class="course-content">
                             <div class="course-level">中级</div>
@@ -536,7 +544,7 @@
                             <button class="course-btn">开始学习</button>
                         </div>
                     </div>
-                    <div class="course-card">
+                    <div class="course-card" data-category="高级表达">
                         <div class="course-image">🎓</div>
                         <div class="course-content">
                             <div class="course-level">高级</div>
@@ -549,7 +557,7 @@
                             <button class="course-btn">开始学习</button>
                         </div>
                     </div>
-                    <div class="course-card">
+                    <div class="course-card" data-category="高级表达">
                         <div class="course-image">🌍</div>
                         <div class="course-content">
                             <div class="course-level">高级</div>
@@ -569,21 +577,21 @@
             <div class="recommended">
                 <h2>推荐学习</h2>
                 <div class="recommended-list">
-                    <div class="recommended-item">
+                    <div class="recommended-item" data-href="daily_practice.html">
                         <div class="recommended-icon">📚</div>
                         <div class="recommended-content">
                             <h3>每日手语练习</h3>
                             <p>每天10分钟，保持手语熟练度</p>
                         </div>
                     </div>
-                    <div class="recommended-item">
+                    <div class="recommended-item" data-href="challenge.html">
                         <div class="recommended-icon">🎯</div>
                         <div class="recommended-content">
                             <h3>手语挑战</h3>
                             <p>参与每周手语挑战，提升技能</p>
                         </div>
                     </div>
-                    <div class="recommended-item">
+                    <div class="recommended-item" data-href="forum.html">
                         <div class="recommended-icon">👥</div>
                         <div class="recommended-content">
                             <h3>学习社区</h3>
@@ -632,6 +640,12 @@
     <script>
         // 课程分类标签切换
         document.addEventListener('DOMContentLoaded', function () {
+            // 初始化学习进度
+            const progress = initLearningProgress();
+
+            // 更新学习进度显示
+            updateLearningProgressDisplay(progress);
+
             const categoryTabs = document.querySelectorAll('.category-tab');
             categoryTabs.forEach(tab => {
                 tab.addEventListener('click', function () {
@@ -640,20 +654,242 @@
                     // 添加当前标签的active类
                     this.classList.add('active');
 
-                    // 模拟课程过滤
-                    alert('已切换到"' + this.textContent + '"分类');
+                    // 筛选课程
+                    const category = this.textContent;
+                    filterCourses(category);
                 });
             });
+
+            // 筛选课程函数
+            function filterCourses(category) {
+                const courseCards = document.querySelectorAll('.course-card');
+                let hasVisibleCards = false;
+
+                courseCards.forEach(card => {
+                    if (category === '全部课程' || card.getAttribute('data-category') === category) {
+                        card.style.display = 'block';
+                        hasVisibleCards = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // 如果没有符合条件的卡片，生成一个新的卡片
+                if (!hasVisibleCards) {
+                    generateCourseCard(category);
+                }
+            }
+
+            // 生成课程卡片函数
+            function generateCourseCard(category) {
+                const coursesContainer = document.querySelector('.courses');
+
+                // 课程数据
+                const courseData = {
+                    '基础入门': {
+                        image: '📚',
+                        level: '基础',
+                        title: '基础入门课程',
+                        description: '学习手语的基本概念和入门知识，适合初学者',
+                        lessons: '12课时',
+                        difficulty: '初级'
+                    },
+                    '日常生活': {
+                        image: '🏠',
+                        level: '基础',
+                        title: '日常生活课程',
+                        description: '学习日常生活中常用的手语表达，提高生活交流能力',
+                        lessons: '15课时',
+                        difficulty: '初级'
+                    },
+                    '职场沟通': {
+                        image: '💼',
+                        level: '中级',
+                        title: '职场沟通课程',
+                        description: '学习职场环境中的专业手语表达，提升职业沟通能力',
+                        lessons: '14课时',
+                        difficulty: '中级'
+                    },
+                    '紧急情况': {
+                        image: '🚨',
+                        level: '中级',
+                        title: '紧急情况课程',
+                        description: '学习紧急情况下的手语表达，提高应对突发情况的能力',
+                        lessons: '10课时',
+                        difficulty: '中级'
+                    },
+                    '高级表达': {
+                        image: '🎓',
+                        level: '高级',
+                        title: '高级表达课程',
+                        description: '学习复杂的手语表达技巧，掌握高级沟通能力',
+                        lessons: '18课时',
+                        difficulty: '高级'
+                    }
+                };
+
+                const data = courseData[category];
+                if (data) {
+                    const card = document.createElement('div');
+                    card.className = 'course-card';
+                    card.setAttribute('data-category', category);
+                    card.innerHTML = `
+                        <div class="course-image">${data.image}</div>
+                        <div class="course-content">
+                            <div class="course-level">${data.level}</div>
+                            <h3>${data.title}</h3>
+                            <p>${data.description}</p>
+                            <div class="course-meta">
+                                <span>${data.lessons}</span>
+                                <span>${data.difficulty}</span>
+                            </div>
+                            <button class="course-btn">开始学习</button>
+                        </div>
+                    `;
+                    coursesContainer.appendChild(card);
+
+                    // 添加课程按钮点击事件
+                    card.querySelector('.course-btn').addEventListener('click', function () {
+                        const courseTitle = card.querySelector('h3').textContent;
+
+                        // 根据课程标题跳转到对应的学习页面
+                        let targetPage = '';
+                        switch (courseTitle) {
+                            case '基础入门课程':
+                                targetPage = 'basic_sign_language.html';
+                                break;
+                            case '日常生活课程':
+                                targetPage = 'daily_life.html';
+                                break;
+                            case '职场沟通课程':
+                                targetPage = 'workplace_communication.html';
+                                break;
+                            case '紧急情况课程':
+                                targetPage = 'emergency_expressions.html';
+                                break;
+                            case '高级表达课程':
+                                targetPage = 'advanced_expressions.html';
+                                break;
+                            default:
+                                // 对于其他课程，使用通用学习页面
+                                targetPage = 'generic_course.html';
+                        }
+
+                        // 跳转到目标页面
+                        window.location.href = targetPage;
+
+                        // 模拟学习进度更新
+                        updateLearningProgress(courseTitle, 100);
+
+                        // 重新加载进度显示
+                        const updatedProgress = getLearningProgressFromDatabase();
+                        updateLearningProgressDisplay(updatedProgress);
+                    });
+                }
+            }
 
             // 课程按钮点击事件
             const courseBtns = document.querySelectorAll('.course-btn');
             courseBtns.forEach(btn => {
                 btn.addEventListener('click', function () {
                     const courseTitle = this.closest('.course-card').querySelector('h3').textContent;
-                    alert('开始学习: ' + courseTitle);
+
+                    // 根据课程标题跳转到对应的学习页面
+                    let targetPage = '';
+                    switch (courseTitle) {
+                        case '手语基础入门':
+                            targetPage = 'basic_sign_language.html';
+                            break;
+                        case '日常生活用语':
+                            targetPage = 'daily_life.html';
+                            break;
+                        case '职场沟通技巧':
+                            targetPage = 'workplace_communication.html';
+                            break;
+                        case '紧急情况表达':
+                            targetPage = 'emergency_expressions.html';
+                            break;
+                        case '高级表达技巧':
+                            targetPage = 'advanced_expressions.html';
+                            break;
+                        case '手语文化与历史':
+                            targetPage = 'sign_language_culture.html';
+                            break;
+                        default:
+                            // 对于AI生成的课程，使用通用学习页面
+                            targetPage = 'generic_course.html';
+                    }
+
+                    // 跳转到目标页面
+                    window.location.href = targetPage;
+
+                    // 模拟学习进度更新
+                    updateLearningProgress(courseTitle, 100);
+
+                    // 重新加载进度显示
+                    const updatedProgress = getLearningProgressFromDatabase();
+                    updateLearningProgressDisplay(updatedProgress);
                 });
             });
+
+            // 推荐学习卡片点击事件
+            const recommendedItems = document.querySelectorAll('.recommended-item');
+            recommendedItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    const href = this.getAttribute('data-href');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                });
+            });
+
+            // 重置学习进度按钮点击事件
+            const resetProgressBtn = document.getElementById('resetProgressBtn');
+            if (resetProgressBtn) {
+                resetProgressBtn.addEventListener('click', function () {
+                    if (confirm('确定要重置所有学习进度吗？此操作不可撤销！')) {
+                        // 重置学习进度
+                        resetLearningProgress();
+
+                        // 重新加载进度显示
+                        const updatedProgress = getLearningProgressFromDatabase();
+                        updateLearningProgressDisplay(updatedProgress);
+
+                        alert('学习进度已重置！');
+                    }
+                });
+            }
         });
+
+        // 更新学习进度显示
+        function updateLearningProgressDisplay(progress) {
+            // 更新总体进度
+            const progressFill = document.querySelector('.progress-fill');
+            if (progressFill) {
+                progressFill.style.width = progress.totalProgress + '%';
+            }
+
+            // 更新总体完成度文本
+            const progressText = document.querySelector('.progress-section p');
+            if (progressText) {
+                progressText.textContent = '总体完成度: ' + progress.totalProgress + '%';
+            }
+
+            // 更新统计数据
+            const statItems = document.querySelectorAll('.stat-item .stat-number');
+            if (statItems.length >= 4) {
+                statItems[0].textContent = progress.completedCourses;
+                statItems[1].textContent = Object.keys(progress.courses).length - progress.completedCourses;
+                statItems[2].textContent = progress.learningHours;
+                statItems[3].textContent = '0%'; // 准确率暂时设为0
+            }
+
+            // 更新等级
+            const levelBadge = document.querySelector('.level-badge');
+            if (levelBadge) {
+                levelBadge.textContent = 'Level ' + progress.level;
+            }
+        }
     </script>
     <script src="script.js"></script>
 </body>

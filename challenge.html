@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手语挑战 - SignBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .emergency-btn {
+            background-color: #e74c3c;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emergency-btn:hover {
+            background-color: #c0392b !important;
+            color: white !important;
+        }
+
+        /* 主内容 */
+        main {
+            margin-top: 100px;
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 挑战卡片 */
+        .challenge-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .challenge-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .challenge-week {
+            background-color: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* 挑战内容 */
+        .challenge-content {
+            margin-bottom: 2rem;
+        }
+
+        .challenge-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .challenge-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .challenge-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-item-title {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .challenge-item-difficulty {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .difficulty-easy {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .difficulty-medium {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .difficulty-hard {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .challenge-item-content {
+            margin-bottom: 1rem;
+        }
+
+        .challenge-sign {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 4rem;
+            margin: 1rem 0;
+        }
+
+        .challenge-description {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .challenge-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 挑战统计 */
+        .challenge-stats {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* 排行榜 */
+        .leaderboard {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaderboard h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .leaderboard-table th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .leaderboard-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .rank-1 {
+            background-color: #fff9c4 !important;
+        }
+
+        .rank-2 {
+            background-color: #e3f2fd !important;
+        }
+
+        .rank-3 {
+            background-color: #ffe0b2 !important;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .challenge-actions {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .leaderboard-table {
+                font-size: 0.9rem;
+            }
+
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html" class="emergency-btn">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h1>手语挑战</h1>
+                <p>参与每周手语挑战，提升技能，与其他学习者竞争</p>
+            </div>
+
+            <!-- 挑战卡片 -->
+            <div class="challenge-card">
+                <div class="challenge-header">
+                    <h2 class="challenge-title">本周挑战</h2>
+                    <span class="challenge-week" id="currentWeek">第1周</span>
+                </div>
+
+                <div class="challenge-content" id="challengeContent">
+                    <!-- 挑战内容将通过JavaScript动态生成 -->
+                </div>
+
+                <div class="challenge-actions">
+                    <button class="btn btn-primary" onclick="generateNewChallenge()">生成新挑战</button>
+                    <button class="btn btn-secondary" onclick="saveChallengeProgress()">保存进度</button>
+                    <button class="btn btn-success" onclick="submitChallenge()">提交挑战</button>
+                </div>
+            </div>
+
+            <!-- 挑战统计 -->
+            <div class="challenge-stats">
+                <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">挑战统计</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalChallenges">0</div>
+                        <div class="stat-label">总挑战次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedChallenges">0</div>
+                        <div class="stat-label">已完成挑战</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="challengeStreak">0</div>
+                        <div class="stat-label">连续挑战天数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="challengeScore">0</div>
+                        <div class="stat-label">总得分</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 排行榜 -->
+            <div class="leaderboard">
+                <h2>挑战排行榜</h2>
+                <table class="leaderboard-table" id="leaderboardTable">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>用户</th>
+                            <th>完成挑战数</th>
+                            <th>总得分</th>
+                            <th>连续天数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 排行榜数据将通过JavaScript动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置当前周数
+            const currentDate = new Date();
+            const weekNumber = getWeekNumber(currentDate);
+            document.getElementById('currentWeek').textContent = `第${weekNumber}周`;
+            
+            // 生成挑战
+            generateNewChallenge();
+            
+            // 加载挑战统计
+            loadChallengeStats();
+            
+            // 加载排行榜
+            loadLeaderboard();
+        });
+
+        // 获取当前周数
+        function getWeekNumber(date) {
+            const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+            const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+            return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+        }
+
+        // 挑战内容库
+        const challengeLibrary = [
+            {
+                title: "基础问候语挑战",
+                difficulty: "easy",
+                description: "完成以下基础问候语的手语表达",
+                items: [
+                    {
+                        word: "你好",
+                        sign: "👋",
+                        points: 10,
+                        tip: "右手伸出，手掌向外，轻轻挥动"
+                    },
+                    {
+                        word: "谢谢",
+                        sign: "🙏",
+                        points: 10,
+                        tip: "双手合十，微微点头"
+                    },
+                    {
+                        word: "再见",
+                        sign: "👋",
+                        points: 10,
+                        tip: "右手伸出，手掌向外，左右挥动"
+                    },
+                    {
+                        word: "早上好",
+                        sign: "🌅",
+                        points: 15,
+                        tip: "右手比作太阳，从下往上移动"
+                    },
+                    {
+                        word: "晚上好",
+                        sign: "🌙",
+                        points: 15,
+                        tip: "右手比作月亮，从左向右移动"
+                    }
+                ]
+            },
+            {
+                title: "数字表达挑战",
+                difficulty: "medium",
+                description: "完成以下数字的手语表达",
+                items: [
+                    {
+                        word: "1",
+                        sign: "☝️",
+                        points: 5,
+                        tip: "伸出食指"
+                    },
+                    {
+                        word: "5",
+                        sign: "🖐️",
+                        points: 5,
+                        tip: "伸出全部五根手指"
+                    },
+                    {
+                        word: "10",
+                        sign: "🔟",
+                        points: 10,
+                        tip: "双手食指交叉"
+                    },
+                    {
+                        word: "100",
+                        sign: "💯",
+                        points: 15,
+                        tip: "右手食指弯曲成圈，然后伸直"
+                    },
+                    {
+                        word: "1000",
+                        sign: "🔄",
+                        points: 20,
+                        tip: "右手食指弯曲成圈，然后顺时针旋转"
+                    }
+                ]
+            },
+            {
+                title: "家庭成员挑战",
+                difficulty: "medium",
+                description: "完成以下家庭成员的手语表达",
+                items: [
+                    {
+                        word: "爸爸",
+                        sign: "👨",
+                        points: 10,
+                        tip: "右手放在下巴处，指尖向上"
+                    },
+                    {
+                        word: "妈妈",
+                        sign: "👩",
+                        points: 10,
+                        tip: "右手放在额头处，指尖向上"
+                    },
+                    {
+                        word: "哥哥",
+                        sign: "👦",
+                        points: 15,
+                        tip: "右手放在太阳穴处，指尖向上，然后向上移动"
+                    },
+                    {
+                        word: "姐姐",
+                        sign: "👧",
+                        points: 15,
+                        tip: "右手放在太阳穴处，指尖向上，然后向下移动"
+                    },
+                    {
+                        word: "爷爷",
+                        sign: "👴",
+                        points: 20,
+                        tip: "右手放在下巴处，指尖向上，然后向上移动"
+                    }
+                ]
+            },
+            {
+                title: "颜色词汇挑战",
+                difficulty: "hard",
+                description: "完成以下颜色词汇的手语表达",
+                items: [
+                    {
+                        word: "红色",
+                        sign: "🔴",
+                        points: 15,
+                        tip: "右手食指指向嘴唇，然后向外移动"
+                    },
+                    {
+                        word: "蓝色",
+                        sign: "🔵",
+                        points: 15,
+                        tip: "右手食指指向太阳穴，然后向外移动"
+                    },
+                    {
+                        word: "绿色",
+                        sign: "🟢",
+                        points: 15,
+                        tip: "右手食指指向胸部，然后向外移动"
+                    },
+                    {
+                        word: "黄色",
+                        sign: "🟡",
+                        points: 15,
+                        tip: "右手食指指向脸颊，然后向外移动"
+                    },
+                    {
+                        word: "黑色",
+                        sign: "⚫",
+                        points: 20,
+                        tip: "右手食指指向额头，然后向外移动"
+                    }
+                ]
+            },
+            {
+                title: "日常用语挑战",
+                difficulty: "hard",
+                description: "完成以下日常用语的手语表达",
+                items: [
+                    {
+                        word: "我很高兴",
+                        sign: "😊",
+                        points: 20,
+                        tip: "双手放在胸部，然后向外张开"
+                    },
+                    {
+                        word: "我不知道",
+                        sign: "🤷",
+                        points: 20,
+                        tip: "双手摊开，掌心向上"
+                    },
+                    {
+                        word: "请帮助我",
+                        sign: "🤝",
+                        points: 25,
+                        tip: "双手掌心向上，向前伸出"
+                    },
+                    {
+                        word: "我需要帮助",
+                        sign: "🆘",
+                        points: 25,
+                        tip: "右手放在胸部，然后向前伸出"
+                    },
+                    {
+                        word: "很高兴认识你",
+                        sign: "🤝",
+                        points: 30,
+                        tip: "双手握手动作，然后微笑"
+                    }
+                ]
+            }
+        ];
+
+        // 生成新挑战
+        function generateNewChallenge() {
+            // 随机选择一个挑战
+            const randomIndex = Math.floor(Math.random() * challengeLibrary.length);
+            const challenge = challengeLibrary[randomIndex];
+            
+            // 生成挑战内容
+            let challengeHTML = `
+                <div class="challenge-item">
+                    <div class="challenge-item-header">
+                        <h3 class="challenge-item-title">${challenge.title}</h3>
+                        <span class="challenge-item-difficulty difficulty-${challenge.difficulty}">${getDifficultyText(challenge.difficulty)}</span>
+                    </div>
+                    <div class="challenge-item-content">
+                        <p>${challenge.description}</p>
+                        <ul style="list-style-type: none; margin-top: 1rem;">
+            `;
+            
+            // 添加挑战项目
+            challenge.items.forEach((item, index) => {
+                challengeHTML += `
+                    <li style="margin-bottom: 2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <p style="font-weight: bold;">${index + 1}. ${item.word}</p>
+                            <span style="background-color: #e3f2fd; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #1976d2;">${item.points} 分</span>
+                        </div>
+                        <div class="challenge-sign">${item.sign}</div>
+                        <div class="challenge-description">
+                            <p style="font-size: 0.9rem;"><strong>提示：</strong>${item.tip}</p>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">练习状态：</label>
+                            <select style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                                <option value="not-started">未开始</option>
+                                <option value="in-progress">进行中</option>
+                                <option value="completed">已完成</option>
+                            </select>
+                        </div>
+                    </li>
+                `;
+            });
+            
+            challengeHTML += `
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            // 更新挑战内容
+            document.getElementById('challengeContent').innerHTML = challengeHTML;
+        }
+
+        // 获取难度文本
+        function getDifficultyText(difficulty) {
+            switch (difficulty) {
+                case 'easy': return '简单';
+                case 'medium': return '中等';
+                case 'hard': return '困难';
+                default: return '未知';
+            }
+        }
+
+        // 保存挑战进度
+        function saveChallengeProgress() {
+            // 获取当前用户
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            const userName = user ? user.username : '匿名用户';
+            
+            // 创建挑战进度数据
+            const challengeProgress = {
+                date: new Date().toISOString().split('T')[0],
+                week: getWeekNumber(new Date()),
+                completed: false,
+                score: 0,
+                timestamp: new Date().toISOString()
+            };
+            
+            // 从localStorage获取挑战记录
+            const challengeRecords = JSON.parse(localStorage.getItem('challengeRecords')) || {};
+            
+            // 确保用户挑战记录存在
+            if (!challengeRecords[userId]) {
+                challengeRecords[userId] = [];
+            }
+            
+            // 添加今天的挑战记录
+            const today = new Date().toISOString().split('T')[0];
+            const existingRecordIndex = challengeRecords[userId].findIndex(record => record.date === today);
+            
+            if (existingRecordIndex > -1) {
+                challengeRecords[userId][existingRecordIndex] = challengeProgress;
+            } else {
+                challengeRecords[userId].push(challengeProgress);
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem('challengeRecords', JSON.stringify(challengeRecords));
+            
+            alert('挑战进度已保存！');
+            
+            // 更新统计信息
+            loadChallengeStats();
+        }
+
+        // 提交挑战
+        function submitChallenge() {
+            // 获取当前用户
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            const userName = user ? user.username : '匿名用户';
+            
+            // 模拟得分（实际应用中应该根据用户表现计算）
+            const score = Math.floor(Math.random() * 50) + 50; // 50-100分
+            
+            // 从localStorage获取挑战记录
+            const challengeRecords = JSON.parse(localStorage.getItem('challengeRecords')) || {};
+            
+            // 确保用户挑战记录存在
+            if (!challengeRecords[userId]) {
+                challengeRecords[userId] = [];
+            }
+            
+            // 更新今天的挑战记录为已完成
+            const today = new Date().toISOString().split('T')[0];
+            const existingRecordIndex = challengeRecords[userId].findIndex(record => record.date === today);
+            
+            if (existingRecordIndex > -1) {
+                challengeRecords[userId][existingRecordIndex].completed = true;
+                challengeRecords[userId][existingRecordIndex].score = score;
+            } else {
+                challengeRecords[userId].push({
+                    date: today,
+                    week: getWeekNumber(new Date()),
+                    completed: true,
+                    score: score,
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem('challengeRecords', JSON.stringify(challengeRecords));
+            
+            alert(`挑战提交成功！得分：${score} 分`);
+            
+            // 更新统计信息
+            loadChallengeStats();
+            loadLeaderboard();
+        }
+
+        // 加载挑战统计
+        function loadChallengeStats() {
+            // 获取当前用户
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            
+            // 从localStorage获取挑战记录
+            const challengeRecords = JSON.parse(localStorage.getItem('challengeRecords')) || {};
+            const userRecords = challengeRecords[userId] || [];
+            
+            // 计算统计数据
+            const totalChallenges = userRecords.length;
+            const completedChallenges = userRecords.filter(record => record.completed).length;
+            const challengeStreak = calculateChallengeStreak(userRecords);
+            const challengeScore = userRecords.reduce((total, record) => total + (record.score || 0), 0);
+            
+            // 更新统计显示
+            document.getElementById('totalChallenges').textContent = totalChallenges;
+            document.getElementById('completedChallenges').textContent = completedChallenges;
+            document.getElementById('challengeStreak').textContent = challengeStreak;
+            document.getElementById('challengeScore').textContent = challengeScore;
+        }
+
+        // 计算连续挑战天数
+        function calculateChallengeStreak(records) {
+            if (records.length === 0) return 0;
+            
+            // 按日期排序
+            const sortedRecords = records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let i = 0; i < sortedRecords.length; i++) {
+                const recordDate = new Date(sortedRecords[i].date);
+                recordDate.setHours(0, 0, 0, 0);
+                
+                const daysDiff = Math.floor((today - recordDate) / (1000 * 60 * 60 * 24));
+                
+                if (daysDiff === i && sortedRecords[i].completed) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // 加载排行榜
+        function loadLeaderboard() {
+            // 从localStorage获取挑战记录
+            const challengeRecords = JSON.parse(localStorage.getItem('challengeRecords')) || {};
+            
+            // 计算每个用户的统计数据
+            const userStats = [];
+            
+            Object.entries(challengeRecords).forEach(([userId, records]) => {
+                // 获取用户信息
+                const user = JSON.parse(localStorage.getItem('user'));
+                const userName = user && user.id === userId ? user.username : '用户' + userId.substring(0, 4);
+                
+                // 计算用户统计数据
+                const completedChallenges = records.filter(record => record.completed).length;
+                const totalScore = records.reduce((total, record) => total + (record.score || 0), 0);
+                const streak = calculateChallengeStreak(records);
+                
+                // 添加到排行榜
+                userStats.push({
+                    userId,
+                    userName,
+                    completedChallenges,
+                    totalScore,
+                    streak
+                });
+            });
+            
+            // 按总得分排序
+            userStats.sort((a, b) => b.totalScore - a.totalScore);
+            
+            // 生成排行榜HTML
+            let leaderboardHTML = '';
+            userStats.forEach((user, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+                leaderboardHTML += `
+                    <tr class="${rankClass}">
+                        <td>${index + 1}</td>
+                        <td>${user.userName}</td>
+                        <td>${user.completedChallenges}</td>
+                        <td>${user.totalScore}</td>
+                        <td>${user.streak}</td>
+                    </tr>
+                `;
+            });
+            
+            // 如果没有数据，显示提示
+            if (userStats.length === 0) {
+                leaderboardHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: #666;">暂无挑战记录</td>
+                    </tr>
+                `;
+            }
+            
+            // 更新排行榜显示
+            document.querySelector('#leaderboardTable tbody').innerHTML = leaderboardHTML;
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>

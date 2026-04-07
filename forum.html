@@ -240,6 +240,7 @@
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
         }
 
         .post-item {
@@ -340,7 +341,7 @@
             cursor: pointer;
         }
 
-        .page-btn:hover {
+        .page-btn:hover:not(.active) {
             background-color: #f8f9fa;
             border-color: #3498db;
         }
@@ -354,11 +355,6 @@
         .page-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        /* 帖子容器样式 */
-        .posts {
-            min-height: 600px;
         }
 
         /* 无帖子提示 */
@@ -463,17 +459,6 @@
 
         .post-item .reply-section.active {
             display: block;
-        }
-
-        .page-btn:hover {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .page-btn.active {
-            background-color: #3498db;
-            color: white;
-            border-color: #3498db;
         }
 
         /* 页脚 */
@@ -836,11 +821,6 @@
             flex-direction: column;
             align-items: center;
             padding: 1.5rem;
-
-            .share-options {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
             background: #f8f9fa;
             border-radius: 8px;
             cursor: pointer;
@@ -1320,6 +1300,9 @@
     <script>
         // 论坛功能
         document.addEventListener('DOMContentLoaded', function () {
+            // 修复：定义缺失的元素
+            const postAuthor = document.getElementById('postAuthor');
+
             // 模态框相关元素
             const postModal = document.getElementById('postModal');
             const postBtn = document.getElementById('post-btn');
@@ -1355,12 +1338,8 @@
             // 打开模态框
             postBtn.addEventListener('click', function () {
                 // 获取当前登录用户信息
-                const user = JSON.parse(localStorage.getItem('user'));
-                if (user && user.username) {
-                    postAuthor.textContent = user.username;
-                } else {
-                    postAuthor.textContent = '游客';
-                }
+                const user = JSON.parse(localStorage.getItem('user')) || { username: '游客' };
+                postAuthor.textContent = user.username;
 
                 // 更新发布时间
                 const now = new Date();
@@ -1389,9 +1368,9 @@
 
             // 点击模态框外部关闭
             window.addEventListener('click', function (e) {
-                if (e.target === postModal) {
-                    closeModal();
-                }
+                if (e.target === postModal) closeModal();
+                if (e.target === postDetailModal) closePostDetailModal();
+                if (e.target === shareModal) shareModal.style.display = 'none';
             });
 
             // 表单提交
@@ -1402,7 +1381,7 @@
                 const title = document.getElementById('postTitle').value.trim();
                 const category = document.getElementById('postCategory').value;
                 const content = document.getElementById('postContent').value.trim();
-                const author = document.getElementById('postAuthor').textContent;
+                const author = postAuthor.textContent;
                 const time = postTime.textContent;
 
                 // 验证表单
@@ -1418,9 +1397,9 @@
                 const newPostData = {
                     title: title,
                     content: content,
-                    author: author,
-                    time: time,
-                    category: category,
+                    author: '作者: ' + author,
+                    time: '发布时间: ' + time,
+                    category: '分类: ' + category,
                     views: '浏览: 0',
                     replies: '回复: 0',
                     likes: '0'
@@ -1566,58 +1545,41 @@
             }
 
             // 帖子标题点击
-            const postLinks = document.querySelectorAll('.post-title a');
-            postLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.post-title a')) {
                     e.preventDefault();
-                    // 打开帖子详情
-                    openPostDetail(this.closest('.post-item'));
-                });
+                    openPostDetail(e.target.closest('.post-item'));
+                }
             });
 
             // 帖子操作按钮
-            const actionBtns = document.querySelectorAll('.action-btn');
-            actionBtns.forEach(btn => {
-                btn.addEventListener('click', function () {
-                    // 检测是否是删除按钮
-                    if (this.textContent.includes('🗑️ 删除') || this.innerHTML.includes('🗑️')) {
-                        // 删除帖子
-                        const postItem = this.closest('.post-item');
-                        const postTitle = postItem.querySelector('.post-title a').textContent;
-                        const postData = allPosts.find(post => post.title === postTitle);
-                        if (postData) {
-                            deletePost(postData, postItem);
-                        }
-                    }
-                    // 检测是否是点赞按钮
-                    else if (this.textContent.includes('👍 点赞') || this.innerHTML.includes('👍')) {
-                        // 获取当前点赞数
-                        const text = this.textContent;
-                        const match = text.match(/\((\d+)\)/);
-                        let count = match ? parseInt(match[1]) : 0;
+            document.addEventListener('click', function (e) {
+                const btn = e.target.closest('.action-btn');
+                if (!btn) return;
 
-                        // 增加点赞数
-                        count++;
-                        this.innerHTML = `👍 点赞 (${count})`;
+                const postItem = btn.closest('.post-item');
 
-                        // 显示成功提示浮窗
-                        showLikeToast(this);
-                    } else if (this.textContent.includes('💬 回复') || this.innerHTML.includes('💬')) {
-                        // 打开帖子详情并聚焦到回复表单
-                        const postItem = this.closest('.post-item');
-                        openPostDetail(postItem);
-                        setTimeout(() => {
-                            replyContent.focus();
-                        }, 100);
-                    } else if (this.textContent.includes('🔗 分享') || this.innerHTML.includes('🔗')) {
-                        // 打开帖子详情并点击分享按钮
-                        const postItem = this.closest('.post-item');
-                        openPostDetail(postItem);
-                        setTimeout(() => {
-                            detailShareBtn.click();
-                        }, 100);
-                    }
-                });
+                // 检测是否是删除按钮
+                if (btn.textContent.includes('🗑️ 删除') || btn.innerHTML.includes('🗑️')) {
+                    const postTitle = postItem.querySelector('.post-title a').textContent;
+                    const postData = allPosts.find(post => post.title === postTitle);
+                    if (postData) deletePost(postData, postItem);
+                }
+                // 检测是否是点赞按钮
+                else if (btn.textContent.includes('👍 点赞') || btn.innerHTML.includes('👍')) {
+                    const text = btn.textContent;
+                    const match = text.match(/\((\d+)\)/);
+                    let count = match ? parseInt(match[1]) : 0;
+                    count++;
+                    btn.innerHTML = `👍 点赞 (${count})`;
+                    showLikeToast(btn);
+                } else if (btn.textContent.includes('💬 回复') || btn.innerHTML.includes('💬')) {
+                    openPostDetail(postItem);
+                    setTimeout(() => replyContent.focus(), 100);
+                } else if (btn.textContent.includes('🔗 分享') || btn.innerHTML.includes('🔗')) {
+                    openPostDetail(postItem);
+                    setTimeout(() => detailShareBtn.click(), 100);
+                }
             });
 
             // 点赞成功提示浮窗函数
@@ -1680,24 +1642,17 @@
                 const metaSpans = postItem.querySelectorAll('.post-header .post-meta span');
                 metaSpans.forEach(span => {
                     const text = span.textContent;
-                    if (text.includes('作者:')) {
-                        author = text;
-                    } else if (text.includes('发布时间:')) {
-                        time = text;
-                    } else if (text.includes('分类:')) {
-                        category = text;
-                    }
+                    if (text.includes('作者:')) author = text;
+                    else if (text.includes('发布时间:')) time = text;
+                    else if (text.includes('分类:')) category = text;
                 });
 
                 // 解析浏览和回复
                 const footerSpans = postItem.querySelectorAll('.post-footer .post-meta span');
                 footerSpans.forEach(span => {
                     const text = span.textContent;
-                    if (text.includes('浏览:')) {
-                        views = text;
-                    } else if (text.includes('回复:')) {
-                        replies = text;
-                    }
+                    if (text.includes('浏览:')) views = text;
+                    else if (text.includes('回复:')) replies = text;
                 });
 
                 // 获取点赞数
@@ -1735,30 +1690,17 @@
             // 关闭按钮点击
             postDetailClose.addEventListener('click', closePostDetailModal);
 
-            // 点击模态框外部关闭
-            window.addEventListener('click', function (e) {
-                if (e.target === postDetailModal) {
-                    closePostDetailModal();
-                }
-            });
-
             // 帖子详情模态框中的按钮事件
             detailLikeBtn.addEventListener('click', function () {
-                // 获取当前点赞数
                 const text = this.textContent;
                 const match = text.match(/\((\d+)\)/);
                 let count = match ? parseInt(match[1]) : 0;
-
-                // 增加点赞数
                 count++;
                 this.innerHTML = `👍 点赞 (${count})`;
-
-                // 显示成功提示浮窗
                 showLikeToast(this);
             });
 
             detailReplyBtn.addEventListener('click', function () {
-                // 滚动到回复表单
                 replyContent.focus();
                 replyContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
@@ -1777,494 +1719,263 @@
 
             // 打开分享模态框
             detailShareBtn.addEventListener('click', function () {
-                // 生成分享链接
                 const postTitle = detailTitle.textContent;
                 const currentUrl = window.location.href;
                 const shareLink = `${currentUrl}#post-${encodeURIComponent(postTitle)}`;
-
-                // 设置分享链接
                 shareLinkInput.value = shareLink;
-
-                // 显示分享模态框
                 shareModal.style.display = 'block';
             });
 
             // 关闭分享模态框
-            shareClose.addEventListener('click', function () {
-                shareModal.style.display = 'none';
-            });
-
-            // 点击模态框外部关闭
-            window.addEventListener('click', function (e) {
-                if (e.target === shareModal) {
-                    shareModal.style.display = 'none';
-                }
-            });
+            shareClose.addEventListener('click', () => shareModal.style.display = 'none');
 
             // 复制链接
             function copyLink() {
                 shareLinkInput.select();
-                document.execCommand('copy');
-
-                // 显示复制成功提示
-                alert('链接已复制到剪贴板！');
+                navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+                    alert('链接已复制到剪贴板！');
+                }).catch(err => {
+                    alert('复制失败，请手动复制！');
+                });
             }
 
-            // 复制链接按钮
             copyLinkBtn.addEventListener('click', copyLink);
             copyLinkInputBtn.addEventListener('click', copyLink);
 
-            // 微信分享
-            shareWechatBtn.addEventListener('click', function () {
-                alert('请使用微信扫描二维码分享');
-                // 实际项目中可以生成二维码
+            // 社交分享
+            shareWechatBtn.addEventListener('click', () => alert('请使用微信扫描二维码分享'));
+            shareQQBtn.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(detailTitle.textContent);
+                window.open(`https://connect.qq.com/widget/shareqq?url=${url}&title=${title}`, '_blank');
             });
-
-            // QQ分享
-            shareQQBtn.addEventListener('click', function () {
-                const postTitle = detailTitle.textContent;
-                const currentUrl = window.location.href;
-                const shareUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(postTitle)}`;
-                window.open(shareUrl, '_blank', 'width=600,height=400');
+            shareWeiboBtn.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(detailTitle.textContent);
+                window.open(`https://service.weibo.com/share?url=${url}&title=${title}`, '_blank');
             });
-
-            // 微博分享
-            shareWeiboBtn.addEventListener('click', function () {
-                const postTitle = detailTitle.textContent;
-                const currentUrl = window.location.href;
-                const shareUrl = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(postTitle)}`;
-                window.open(shareUrl, '_blank', 'width=600,height=400');
+            shareFacebookBtn.addEventListener('click', () => {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
             });
-
-            // Facebook分享
-            shareFacebookBtn.addEventListener('click', function () {
-                const currentUrl = window.location.href;
-                const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
-                window.open(shareUrl, '_blank', 'width=600,height=400');
-            });
-
-            // Twitter分享
-            shareTwitterBtn.addEventListener('click', function () {
-                const postTitle = detailTitle.textContent;
-                const currentUrl = window.location.href;
-                const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(postTitle)}`;
-                window.open(shareUrl, '_blank', 'width=600,height=400');
+            shareTwitterBtn.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(detailTitle.textContent);
+                window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
             });
 
             // 回复功能
-            const postReplies = {}; // 存储每个帖子的回复
+            const postReplies = {};
 
-            // 加载回复列表
             function loadReplies(postId) {
                 replyList.innerHTML = '';
-
                 const replies = postReplies[postId] || [];
-
                 if (replies.length === 0) {
                     replyList.innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">暂无回复，快来发表第一条回复吧！</p>';
                     return;
                 }
-
                 replies.forEach(reply => {
-                    const replyElement = document.createElement('div');
-                    replyElement.className = 'reply-item';
-                    replyElement.innerHTML = `
+                    const el = document.createElement('div');
+                    el.className = 'reply-item';
+                    el.innerHTML = `
                         <div class="reply-header">
                             <span class="reply-author">${reply.author}</span>
                             <span class="reply-time">${reply.time}</span>
                         </div>
                         <div class="reply-content">${reply.content}</div>
                     `;
-                    replyList.appendChild(replyElement);
+                    replyList.appendChild(el);
                 });
             }
 
-            // 提交回复
             function submitReply() {
                 const content = replyContent.value.trim();
+                if (!content) return alert('请输入回复内容');
 
-                if (!content) {
-                    alert('请输入回复内容');
-                    return;
-                }
-
-                // 创建回复数据
                 const now = new Date();
-                const timeString = now.getFullYear() + '-' +
-                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                    String(now.getDate()).padStart(2, '0') + ' ' +
-                    String(now.getHours()).padStart(2, '0') + ':' +
-                    String(now.getMinutes()).padStart(2, '0') + ':' +
-                    String(now.getSeconds()).padStart(2, '0');
+                const timeStr = now.toLocaleString();
+                const user = JSON.parse(localStorage.getItem('user')) || { username: '游客' };
 
-                // 获取当前登录用户的作者信息
-                const user = JSON.parse(localStorage.getItem('user'));
-                const author = user && user.username ? user.username : '游客';
-
-                const replyData = {
-                    author: author,
-                    time: timeString,
+                const reply = {
+                    author: user.username,
+                    time: timeStr,
                     content: content
                 };
 
-                // 存储回复
-                if (!postReplies[currentPostId]) {
-                    postReplies[currentPostId] = [];
-                }
-                postReplies[currentPostId].push(replyData);
+                if (!postReplies[currentPostId]) postReplies[currentPostId] = [];
+                postReplies[currentPostId].push(reply);
 
-                // 重新加载回复列表
                 loadReplies(currentPostId);
-
-                // 更新回复计数
                 updateReplyCount(currentPostId);
-
-                // 清空输入框
                 replyContent.value = '';
-
-                // 显示成功提示
                 alert('回复发表成功！');
             }
 
-            // 更新回复计数
             function updateReplyCount(postId) {
-                const replyCount = postReplies[postId] ? postReplies[postId].length : 0;
+                const count = postReplies[postId]?.length || 0;
+                detailReplies.textContent = `回复: ${count}`;
 
-                // 更新详情模态框中的回复数
-                detailReplies.textContent = `回复: ${replyCount}`;
-
-                // 更新帖子列表中的回复数
-                const postItems = document.querySelectorAll('.post-item');
-                postItems.forEach(item => {
-                    const title = item.querySelector('.post-title a').textContent;
-                    if (title === postId) {
-                        const replySpan = item.querySelector('.post-footer .post-meta span:nth-child(2)');
-                        if (replySpan) {
-                            replySpan.textContent = `回复: ${replyCount}`;
-                        }
+                document.querySelectorAll('.post-item').forEach(item => {
+                    if (item.querySelector('.post-title a').textContent === postId) {
+                        item.querySelector('.post-footer .post-meta span:nth-child(2)').textContent = `回复: ${count}`;
                     }
                 });
 
-                // 更新帖子数据中的回复数
-                const postIndex = allPosts.findIndex(post => post.title === postId);
-                if (postIndex !== -1) {
-                    allPosts[postIndex].replies = `回复: ${replyCount}`;
-                }
+                const idx = allPosts.findIndex(p => p.title === postId);
+                if (idx !== -1) allPosts[idx].replies = `回复: ${count}`;
             }
 
-            // 回复按钮点击事件
-            detailReplyBtn.addEventListener('click', function () {
-                // 滚动到回复表单
-                replyContent.focus();
-                replyContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            cancelReplyBtn.addEventListener('click', () => replyContent.value = '');
+            submitReplyBtn.addEventListener('click', submitReply);
+            replyContent.addEventListener('keydown', e => {
+                if (e.ctrlKey && e.key === 'Enter') submitReply();
             });
 
-            // 取消回复按钮
-            cancelReplyBtn.addEventListener('click', function () {
-                replyContent.value = '';
-            });
-
-            // 提交回复按钮
-            submitReplyBtn.addEventListener('click', function () {
-                submitReply();
-            });
-
-            // 回复输入框回车提交（Ctrl+Enter）
-            replyContent.addEventListener('keydown', function (e) {
-                if (e.ctrlKey && e.key === 'Enter') {
-                    submitReply();
-                }
-            });
-
-            // 分页功能
-            const pageSize = 5; // 每页显示的帖子数量
+            // 分页 & 数据存储
+            const pageSize = 5;
             let currentPage = 1;
             let allPosts = [];
 
-            // 初始化帖子数据
             function initPosts() {
-                // 首先从localStorage加载已保存的帖子
-                const savedPosts = localStorage.getItem('forumPosts');
-                if (savedPosts) {
-                    const parsedPosts = JSON.parse(savedPosts);
-                    // 将保存的帖子添加到allPosts数组
-                    allPosts = parsedPosts;
-                }
+                const saved = localStorage.getItem('forumPosts');
+                if (saved) allPosts = JSON.parse(saved);
 
-                // 收集HTML中的初始帖子（避免重复）
-                const postItems = document.querySelectorAll('.post-item');
-                postItems.forEach(item => {
-                    // 提取帖子信息
+                document.querySelectorAll('.post-item').forEach(item => {
                     const title = item.querySelector('.post-title a').textContent;
+                    if (allPosts.some(p => p.title === title)) return;
+
                     const content = item.querySelector('.post-content').innerHTML;
-                    const metaSpans = item.querySelectorAll('.post-header .post-meta span');
-                    let author = '';
-                    let time = '';
-                    let category = '';
+                    let author, time, category, views, replies, likes;
 
-                    metaSpans.forEach(span => {
-                        const text = span.textContent;
-                        if (text.includes('作者:')) author = text;
-                        else if (text.includes('发布时间:')) time = text;
-                        else if (text.includes('分类:')) category = text;
+                    item.querySelectorAll('.post-header .post-meta span').forEach(s => {
+                        if (s.textContent.includes('作者:')) author = s.textContent;
+                        if (s.textContent.includes('发布时间:')) time = s.textContent;
+                        if (s.textContent.includes('分类:')) category = s.textContent;
                     });
 
-                    const footerSpans = item.querySelectorAll('.post-footer .post-meta span');
-                    let views = '浏览: 0';
-                    let replies = '回复: 0';
-
-                    footerSpans.forEach(span => {
-                        const text = span.textContent;
-                        if (text.includes('浏览:')) views = text;
-                        else if (text.includes('回复:')) replies = text;
+                    item.querySelectorAll('.post-footer .post-meta span').forEach(s => {
+                        if (s.textContent.includes('浏览:')) views = s.textContent;
+                        if (s.textContent.includes('回复:')) replies = s.textContent;
                     });
 
-                    const likeBtn = item.querySelector('.action-btn:nth-child(1)');
-                    const likeCount = likeBtn ? likeBtn.textContent.match(/\((\d+)\)/) : null;
-                    const likes = likeCount ? likeCount[1] : '0';
+                    likes = item.querySelector('.action-btn:nth-child(1)').textContent.match(/\((\d+)\)/)?.[1] || '0';
 
-                    // 检查是否已存在相同标题的帖子
-                    const exists = allPosts.some(post => post.title === title);
-                    if (!exists) {
-                        // 存储帖子数据
-                        allPosts.push({
-                            title,
-                            content,
-                            author,
-                            time,
-                            category,
-                            views,
-                            replies,
-                            likes,
-                            element: item
-                        });
-                    }
+                    allPosts.push({ title, content, author, time, category, views, replies, likes });
                 });
 
-                // 按发布时间排序（假设时间格式为 YYYY-MM-DD）
-                allPosts.sort((a, b) => {
-                    const dateA = new Date(a.time.replace('发布时间: ', ''));
-                    const dateB = new Date(b.time.replace('发布时间: ', ''));
-                    return dateB - dateA; // 降序排列，最新的在前
-                });
-
-                // 保存到localStorage
+                allPosts.sort((a, b) => new Date(b.time.replace('发布时间: ', '')) - new Date(a.time.replace('发布时间: ', '')));
                 savePostsToStorage();
-
-                // 显示第一页
                 showPage(1);
             }
 
-            // 保存帖子到localStorage
             function savePostsToStorage() {
-                // 移除element属性，因为DOM元素不能被序列化
-                const postsToSave = allPosts.map(post => {
-                    const { element, ...postWithoutElement } = post;
-                    return postWithoutElement;
-                });
-                localStorage.setItem('forumPosts', JSON.stringify(postsToSave));
+                localStorage.setItem('forumPosts', JSON.stringify(allPosts));
             }
 
-            // 显示指定页码的帖子
             function showPage(page) {
                 currentPage = page;
+                const container = document.querySelector('.posts');
+                container.innerHTML = '';
 
-                // 清空帖子容器
-                const postsContainer = document.querySelector('.posts');
-                postsContainer.innerHTML = '';
+                const show = currentCategory ? filteredPosts : allPosts;
+                const pageData = show.slice((page - 1) * pageSize, page * pageSize);
 
-                // 使用筛选后的帖子（如果没有筛选则使用全部帖子）
-                const postsToShow = filteredPosts.length > 0 || currentCategory ? filteredPosts : allPosts;
-
-                // 计算当前页的帖子范围
-                const startIndex = (page - 1) * pageSize;
-                const endIndex = startIndex + pageSize;
-                const pagePosts = postsToShow.slice(startIndex, endIndex);
-
-                // 显示当前页的帖子
-                if (pagePosts.length > 0) {
-                    pagePosts.forEach(postData => {
-                        // 重新创建帖子元素
-                        const postElement = document.createElement('div');
-                        postElement.className = 'post-item';
-                        postElement.innerHTML = `
-                            <div class="post-header">
-                                <div>
-                                    <h3 class="post-title"><a href="#">${postData.title}</a></h3>
-                                    <div class="post-meta">
-                                        <span>${postData.author}</span>
-                                        <span>${postData.time}</span>
-                                        <span>${postData.category}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="post-content">
-                                ${postData.content}
-                            </div>
-                            <div class="post-footer">
-                                <div class="post-meta">
-                                    <span>${postData.views}</span>
-                                    <span>${postData.replies}</span>
-                                </div>
-                                <div class="post-actions">
-                                    <button class="action-btn">👍 点赞 (${postData.likes})</button>
-                                    <button class="action-btn">💬 回复</button>
-                                    <button class="action-btn">🔗 分享</button>
-                                    <button class="action-btn delete-btn">🗑️ 删除</button>
-                                </div>
-                            </div>
-                        `;
-
-                        // 添加事件监听
-                        const postLink = postElement.querySelector('.post-title a');
-                        postLink.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            openPostDetail(postElement);
-                        });
-
-                        const actionBtns = postElement.querySelectorAll('.action-btn');
-                        actionBtns.forEach(btn => {
-                            btn.addEventListener('click', function () {
-                                if (this.textContent.includes('🗑️ 删除') || this.innerHTML.includes('🗑️')) {
-                                    // 删除帖子
-                                    deletePost(postData, postElement);
-                                } else if (this.textContent.includes('👍 点赞') || this.innerHTML.includes('👍')) {
-                                    const text = this.textContent;
-                                    const match = text.match(/\((\d+)\)/);
-                                    let count = match ? parseInt(match[1]) : 0;
-                                    count++;
-                                    this.innerHTML = `👍 点赞 (${count})`;
-                                    showLikeToast(this);
-                                } else if (this.textContent.includes('💬 回复') || this.innerHTML.includes('💬')) {
-                                    // 打开帖子详情并聚焦到回复表单
-                                    openPostDetail(postElement);
-                                    setTimeout(() => {
-                                        replyContent.focus();
-                                    }, 100);
-                                } else if (this.textContent.includes('🔗 分享') || this.innerHTML.includes('🔗')) {
-                                    // 打开帖子详情并点击分享按钮
-                                    openPostDetail(postElement);
-                                    setTimeout(() => {
-                                        detailShareBtn.click();
-                                    }, 100);
-                                }
-                            });
-                        });
-
-                        postsContainer.appendChild(postElement);
-                    });
-                } else {
-                    // 显示无帖子提示
-                    const noPostsElement = document.createElement('div');
-                    noPostsElement.className = 'no-posts';
-                    noPostsElement.textContent = '当前页面没有帖子';
-                    postsContainer.appendChild(noPostsElement);
+                if (pageData.length === 0) {
+                    container.innerHTML = '<div class="no-posts">当前页面没有帖子</div>';
+                    updatePagination();
+                    return;
                 }
 
-                // 更新分页按钮状态
+                pageData.forEach(data => {
+                    const el = document.createElement('div');
+                    el.className = 'post-item';
+                    el.innerHTML = `
+                        <div class="post-header">
+                            <div>
+                                <h3 class="post-title"><a href="#">${data.title}</a></h3>
+                                <div class="post-meta">
+                                    <span>${data.author}</span>
+                                    <span>${data.time}</span>
+                                    <span>${data.category}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">${data.content}</div>
+                        <div class="post-footer">
+                            <div class="post-meta">
+                                <span>${data.views}</span>
+                                <span>${data.replies}</span>
+                            </div>
+                            <div class="post-actions">
+                                <button class="action-btn">👍 点赞 (${data.likes})</button>
+                                <button class="action-btn">💬 回复</button>
+                                <button class="action-btn">🔗 分享</button>
+                                <button class="action-btn delete-btn">🗑️ 删除</button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(el);
+                });
+
                 updatePagination();
             }
 
-            // 更新分页按钮状态
             function updatePagination() {
-                const paginationContainer = document.querySelector('.pagination');
-                const postsToShow = filteredPosts.length > 0 || currentCategory ? filteredPosts : allPosts;
-                const totalPages = Math.ceil(postsToShow.length / pageSize);
+                const container = document.querySelector('.pagination');
+                container.innerHTML = '';
+                const total = Math.ceil((currentCategory ? filteredPosts : allPosts).length / pageSize);
 
-                // 清空现有分页按钮
-                paginationContainer.innerHTML = '';
-
-                // 添加上一页按钮
-                const prevBtn = document.createElement('a');
-                prevBtn.href = '#';
-                prevBtn.className = 'page-btn';
-                prevBtn.textContent = '上一页';
-                prevBtn.disabled = currentPage === 1;
-                prevBtn.addEventListener('click', function (e) {
+                const prev = document.createElement('a');
+                prev.className = 'page-btn';
+                prev.textContent = '上一页';
+                prev.onclick = e => {
                     e.preventDefault();
-                    if (currentPage > 1) {
-                        showPage(currentPage - 1);
-                    }
-                });
-                paginationContainer.appendChild(prevBtn);
+                    if (currentPage > 1) showPage(currentPage - 1);
+                };
+                container.appendChild(prev);
 
-                // 添加页码按钮
-                for (let i = 1; i <= totalPages; i++) {
-                    const pageBtn = document.createElement('a');
-                    pageBtn.href = '#';
-                    pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                    pageBtn.textContent = i;
-                    pageBtn.addEventListener('click', function (e) {
+                for (let i = 1; i <= total; i++) {
+                    const btn = document.createElement('a');
+                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                    btn.textContent = i;
+                    btn.onclick = e => {
                         e.preventDefault();
                         showPage(i);
-                    });
-                    paginationContainer.appendChild(pageBtn);
+                    };
+                    container.appendChild(btn);
                 }
 
-                // 添加下一页按钮
-                const nextBtn = document.createElement('a');
-                nextBtn.href = '#';
-                nextBtn.className = 'page-btn';
-                nextBtn.textContent = '下一页';
-                nextBtn.disabled = currentPage === totalPages;
-                nextBtn.addEventListener('click', function (e) {
+                const next = document.createElement('a');
+                next.className = 'page-btn';
+                next.textContent = '下一页';
+                next.onclick = e => {
                     e.preventDefault();
-                    if (currentPage < totalPages) {
-                        showPage(currentPage + 1);
-                    }
-                });
-                paginationContainer.appendChild(nextBtn);
+                    if (currentPage < total) showPage(currentPage + 1);
+                };
+                container.appendChild(next);
             }
 
-            // 添加新帖子到列表
-            function addNewPost(postData) {
-                // 将新帖子添加到数组开头
-                allPosts.unshift(postData);
-
-                // 保存到localStorage
+            function addNewPost(data) {
+                allPosts.unshift(data);
                 savePostsToStorage();
-
-                // 重新显示第一页
                 showPage(1);
             }
 
-            // 删除帖子
-            function deletePost(postData, postElement) {
-                // 要求输入密码
-                const password = prompt('请输入删除密码（默认密码：123）：');
-
-                if (password === '123') {
-                    // 密码正确，删除帖子
-                    if (confirm('确定要删除这个帖子吗？此操作不可恢复。')) {
-                        // 从allPosts数组中删除
-                        const index = allPosts.findIndex(post => post.title === postData.title);
-                        if (index > -1) {
-                            allPosts.splice(index, 1);
-
-                            // 保存到localStorage
-                            savePostsToStorage();
-
-                            // 重新显示当前页
-                            showPage(currentPage);
-
-                            // 显示成功提示
-                            alert('帖子删除成功！');
-                        }
+            function deletePost(data, el) {
+                const pwd = prompt('请输入删除密码（默认：123）');
+                if (pwd === '123') {
+                    if (confirm('确定删除？不可恢复！')) {
+                        allPosts = allPosts.filter(p => p.title !== data.title);
+                        savePostsToStorage();
+                        showPage(currentPage);
+                        alert('删除成功');
                     }
-                } else if (password !== null) {
-                    // 密码错误
-                    alert('密码错误，无法删除帖子！');
-                }
+                } else if (pwd !== null) alert('密码错误');
             }
 
-            // 初始化帖子数据
             initPosts();
-
-            // 初始化筛选后的帖子
             filteredPosts = allPosts;
         });
     </script>
-    <script src="script.js"></script>
 </body>
 
 </html>
