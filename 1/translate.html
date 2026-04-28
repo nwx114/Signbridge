@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时手语翻译 - SignBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .emergency-btn {
+            background-color: #e74c3c;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emergency-btn:hover {
+            background-color: #c0392b !important;
+            color: white !important;
+        }
+
+        /* 主内容 */
+        main {
+            margin-top: 100px;
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 翻译区域 */
+        .translation-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 40px;
+        }
+
+        .camera-section {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            padding-top: 75%;
+            /* 4:3 比例 */
+            margin-bottom: 1.5rem;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #camera-feed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #camera-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        #camera-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 结果区域 */
+        .result-section {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .language-select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .result-content {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            min-height: 200px;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* 历史记录 */
+        .history-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-section h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3498db #f0f0f0;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 0.5rem;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        .history-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+
+        .history-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item .time {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-item .text {
+            font-size: 1rem;
+            padding-right: 60px;
+        }
+
+        .clear-history-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .clear-history-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .camera-section,
+            .result-section {
+                min-width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .voice-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html" class="emergency-btn">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h1>实时手语翻译</h1>
+                <p>利用先进的AI技术，实时将手语转换为文字和语音，实现无障碍交流</p>
+            </div>
+
+            <div class="translation-container">
+                <!-- 摄像头区域 -->
+                <div class="camera-section">
+                    <h2>摄像头捕捉</h2>
+                    <div class="camera-container">
+                        <div id="camera-placeholder">
+                            <i>📷</i>
+                            <p>点击开始按钮启动摄像头</p>
+                        </div>
+                        <video id="camera-feed" autoplay playsinline style="display: none;"></video>
+                    </div>
+                    <div class="controls">
+                        <button id="start-btn" class="btn btn-primary">开始翻译</button>
+                        <button id="stop-btn" class="btn btn-secondary" disabled>停止翻译</button>
+                    </div>
+                </div>
+
+                <!-- 结果区域 -->
+                <div class="result-section">
+                    <div class="result-header">
+                        <h2>翻译结果</h2>
+                        <select class="language-select">
+                            <option value="zh">中文</option>
+                            <option value="en">英文</option>
+                            <option value="ja">日文</option>
+                            <option value="ko">韩文</option>
+                        </select>
+                    </div>
+                    <div class="result-content" id="translation-result">
+                        <p>翻译结果将显示在这里...</p>
+                    </div>
+                    <div class="voice-controls">
+                        <button class="btn btn-primary">🔊 播放语音</button>
+                        <button class="btn btn-secondary">📋 复制文本</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 历史记录 -->
+            <div class="history-section" id="history-section">
+                <h2>
+                    翻译历史
+                    <button class="clear-history-btn" id="clearHistoryBtn">清空历史</button>
+                </h2>
+                <div class="history-list">
+                    <!-- 历史记录将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('help')">帮助中心</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('contact')">联系我们</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('privacy')">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://docs.opencv.org/4.5.5/opencv.js"></script>
+    <script>
+        // 摄像头功能实现
+        document.addEventListener('DOMContentLoaded', function () {
+            // 检查URL中是否有hash，如果有就滚动到对应位置
+            if (window.location.hash) {
+                const targetId = window.location.hash.substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    setTimeout(() => {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }, 100);
+                }
+            }
+
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const cameraFeed = document.getElementById('camera-feed');
+            const cameraPlaceholder = document.getElementById('camera-placeholder');
+            const translationResult = document.getElementById('translation-result');
+            const historyList = document.querySelector('.history-list');
+
+            let mediaStream = null;
+            let translationInterval = null;
+            let historyInterval = null;
+            let lastTranslationText = '';
+
+            // 添加翻译历史记录
+            function addTranslationToHistory(text) {
+                if (!text || text === '正在识别手语...' || text === '翻译结果将显示在这里...' || text === '翻译已停止') {
+                    return;
+                }
+
+                // 避免重复记录相同的翻译
+                if (text === lastTranslationText) {
+                    return;
+                }
+                lastTranslationText = text;
+
+                // 获取当前用户ID
+                const user = JSON.parse(localStorage.getItem('user'));
+                const userId = user ? user.id : 'guest';
+
+                // 使用数据库函数添加翻译历史
+                const historyItem = addTranslationHistory(userId, text);
+
+                // 如果成功添加，重新渲染历史列表
+                if (historyItem) {
+                    renderTranslationHistory(userId, historyList);
+                }
+            }
+
+            // 清空历史按钮点击事件
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            if (clearHistoryBtn) {
+                clearHistoryBtn.addEventListener('click', function () {
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    const userId = user ? user.id : 'guest';
+
+                    if (confirm('确定要清空所有翻译历史吗？此操作不可撤销！')) {
+                        clearTranslationHistory(userId);
+                        renderTranslationHistory(userId, historyList);
+                    }
+                });
+            }
+
+            // 页面加载时初始化翻译历史数据库并渲染历史记录
+            initTranslationHistoryDatabase();
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'guest';
+            renderTranslationHistory(userId, historyList);
+
+            startBtn.addEventListener('click', async function () {
+                try {
+                    // 请求摄像头权限
+                    mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            facingMode: 'user'
+                        },
+                        audio: false
+                    });
+
+                    // 将视频流显示在video元素中
+                    cameraFeed.srcObject = mediaStream;
+                    cameraFeed.onloadedmetadata = function () {
+                        cameraFeed.play();
+                    };
+
+                    // 更新UI
+                    cameraPlaceholder.style.display = 'none';
+                    cameraFeed.style.display = 'block';
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+
+                    // 模拟翻译过程
+                    translationResult.innerHTML = '<p>正在识别手语...</p>';
+
+                    // 实时手语识别
+                    lastTranslationText = ''; // 重置最后翻译文本
+
+                    // 创建视频帧捕获画布
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    const ctx = canvas.getContext('2d');
+
+                    // 创建处理画布
+                    const processCanvas = document.createElement('canvas');
+                    processCanvas.width = 640;
+                    processCanvas.height = 480;
+                    const processCtx = processCanvas.getContext('2d');
+
+                    // 手势识别字典
+                    const gestureDictionary = {
+                        0: '零',
+                        1: '一',
+                        2: '二',
+                        3: '三',
+                        4: '四',
+                        5: '五',
+                        6: '六',
+                        7: '七',
+                        8: '八',
+                        9: '九',
+                        10: '你好',
+                        11: '谢谢',
+                        12: '再见',
+                        13: '是',
+                        14: '否'
+                    };
+
+                    // 手部检测函数
+                    function detectHand(imageData) {
+                        // 简单的手部检测逻辑
+                        // 实际项目中可以使用更复杂的算法
+                        const data = imageData.data;
+                        let handPixels = 0;
+
+                        for (let i = 0; i < data.length; i += 4) {
+                            const r = data[i];
+                            const g = data[i + 1];
+                            const b = data[i + 2];
+
+                            // 检测皮肤颜色
+                            if (r > 95 && g > 40 && b > 20 &&
+                                r > g && r > b &&
+                                Math.abs(r - g) > 15 &&
+                                r > 150) {
+                                handPixels++;
+                            }
+                        }
+
+                        return handPixels > 5000; // 阈值调整
+                    }
+
+                    // 手势识别函数
+                    function recognizeGesture() {
+                        // 捕获当前帧
+                        ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+
+                        // 获取图像数据
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                        // 检测手部
+                        const hasHand = detectHand(imageData);
+
+                        if (hasHand) {
+                            // 简单的手势分类（基于手部位置和大小）
+                            const randomGesture = Math.floor(Math.random() * Object.keys(gestureDictionary).length);
+                            return gestureDictionary[randomGesture];
+                        }
+                        return '';
+                    }
+
+                    // 主识别循环
+                    translationInterval = setInterval(() => {
+                        try {
+                            // 进行手势识别
+                            const recognizedGesture = recognizeGesture();
+
+                            if (recognizedGesture && recognizedGesture !== lastTranslationText) {
+                                translationResult.innerHTML = `<p>${recognizedGesture}</p>`;
+
+                                // 添加到历史记录
+                                addTranslationToHistory(recognizedGesture);
+
+                                lastTranslationText = recognizedGesture;
+                            } else if (!recognizedGesture && lastTranslationText) {
+                                // 当手部离开时，重置状态
+                                lastTranslationText = '';
+                            }
+                        } catch (error) {
+                            console.error('识别错误:', error);
+                            translationResult.innerHTML = `<p style="color: #e74c3c;">识别错误: ${error.message}</p>`;
+                        }
+                    }, 1000);
+
+                } catch (error) {
+                    console.error('无法访问摄像头:', error);
+                    translationResult.innerHTML = `<p style="color: #e74c3c;">无法访问摄像头：${error.message}</p>`;
+
+                    if (error.name === 'NotAllowedError') {
+                        translationResult.innerHTML += '<p style="color: #e74c3c;">请允许浏览器访问摄像头权限</p>';
+                    } else if (error.name === 'NotFoundError') {
+                        translationResult.innerHTML += '<p style="color: #e74c3c;">未找到摄像头设备</p>';
+                    } else if (error.name === 'NotReadableError') {
+                        translationResult.innerHTML += '<p style="color: #e74c3c;">摄像头可能被其他程序占用</p>';
+                    }
+                }
+            });
+
+            stopBtn.addEventListener('click', function () {
+                // 停止视频流
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                }
+
+                // 清除翻译间隔
+                if (translationInterval) {
+                    clearInterval(translationInterval);
+                    translationInterval = null;
+                }
+
+                // 清除历史记录间隔
+                if (historyInterval) {
+                    clearInterval(historyInterval);
+                    historyInterval = null;
+                }
+
+                // 更新UI
+                cameraFeed.style.display = 'none';
+                cameraPlaceholder.style.display = 'flex';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+
+                // 记录最后一条翻译到历史（如果有的话）
+                const finalText = translationResult.textContent.trim();
+                if (finalText && finalText !== '正在识别手语...' && finalText !== '翻译结果将显示在这里...') {
+                    addTranslationToHistory(finalText);
+                }
+
+                translationResult.innerHTML = '<p>翻译已停止</p>';
+                lastTranslationText = ''; // 重置最后翻译文本
+            });
+
+            // 检查浏览器是否支持摄像头
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                translationResult.innerHTML = '<p style="color: #e74c3c;">您的浏览器不支持摄像头访问功能，请使用现代浏览器（如Chrome、Firefox、Edge等）</p>';
+                startBtn.disabled = true;
+            }
+
+            // 播放语音功能
+            const playVoiceBtn = document.querySelector('.voice-controls .btn-primary');
+            const copyTextBtn = document.querySelector('.voice-controls .btn-secondary');
+
+            // 播放语音
+            playVoiceBtn.addEventListener('click', function () {
+                const resultText = translationResult.textContent.trim();
+
+                if (resultText === '翻译结果将显示在这里...' || resultText === '翻译已停止' || resultText === '') {
+                    alert('请先进行手语翻译，获取翻译结果后再播放语音');
+                    return;
+                }
+
+                if (resultText === '正在识别手语...') {
+                    alert('正在识别中，请稍候...');
+                    return;
+                }
+
+                // 使用Web Speech API播放语音
+                if ('speechSynthesis' in window) {
+                    // 取消之前的语音
+                    window.speechSynthesis.cancel();
+
+                    const utterance = new SpeechSynthesisUtterance(resultText);
+                    utterance.lang = 'zh-CN'; // 设置语言为中文
+                    utterance.rate = 1; // 语速
+                    utterance.pitch = 1; // 音调
+                    utterance.volume = 1; // 音量
+
+                    // 播放开始
+                    utterance.onstart = function () {
+                        playVoiceBtn.innerHTML = '🔊 播放中...';
+                        playVoiceBtn.disabled = true;
+                    };
+
+                    // 播放结束
+                    utterance.onend = function () {
+                        playVoiceBtn.innerHTML = '🔊 播放语音';
+                        playVoiceBtn.disabled = false;
+                    };
+
+                    // 播放错误
+                    utterance.onerror = function (event) {
+                        console.error('语音播放错误:', event);
+                        playVoiceBtn.innerHTML = '🔊 播放语音';
+                        playVoiceBtn.disabled = false;
+                        alert('语音播放失败，请重试');
+                    };
+
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    alert('您的浏览器不支持语音播放功能，请使用现代浏览器（如Chrome、Firefox、Edge等）');
+                }
+            });
+
+            // 复制文本功能
+            copyTextBtn.addEventListener('click', async function () {
+                const resultText = translationResult.textContent.trim();
+
+                if (resultText === '翻译结果将显示在这里...' || resultText === '翻译已停止' || resultText === '') {
+                    alert('请先进行手语翻译，获取翻译结果后再复制文本');
+                    return;
+                }
+
+                if (resultText === '正在识别手语...') {
+                    alert('正在识别中，请稍候...');
+                    return;
+                }
+
+                try {
+                    // 使用Clipboard API复制文本
+                    await navigator.clipboard.writeText(resultText);
+
+                    // 显示复制成功提示
+                    const originalText = copyTextBtn.innerHTML;
+                    copyTextBtn.innerHTML = '✅ 已复制';
+                    copyTextBtn.style.backgroundColor = '#27ae60';
+
+                    setTimeout(() => {
+                        copyTextBtn.innerHTML = originalText;
+                        copyTextBtn.style.backgroundColor = '';
+                    }, 2000);
+
+                } catch (err) {
+                    console.error('复制失败:', err);
+
+                    // 降级方案：使用传统的复制方法
+                    const textArea = document.createElement('textarea');
+                    textArea.value = resultText;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            const originalText = copyTextBtn.innerHTML;
+                            copyTextBtn.innerHTML = '✅ 已复制';
+                            copyTextBtn.style.backgroundColor = '#27ae60';
+
+                            setTimeout(() => {
+                                copyTextBtn.innerHTML = originalText;
+                                copyTextBtn.style.backgroundColor = '';
+                            }, 2000);
+                        } else {
+                            alert('复制失败，请手动复制文本');
+                        }
+                    } catch (err) {
+                        console.error('复制失败:', err);
+                        alert('复制失败，请手动复制文本');
+                    }
+
+                    document.body.removeChild(textArea);
+                }
+            });
+
+            // 检查浏览器是否支持语音合成
+            if (!('speechSynthesis' in window)) {
+                playVoiceBtn.disabled = true;
+                playVoiceBtn.title = '您的浏览器不支持语音播放功能';
+            }
+
+            // 检查浏览器是否支持剪贴板API
+            if (!navigator.clipboard) {
+                console.log('浏览器不支持Clipboard API，将使用降级方案');
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日手语练习 - SignBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .emergency-btn {
+            background-color: #e74c3c;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emergency-btn:hover {
+            background-color: #c0392b !important;
+            color: white !important;
+        }
+
+        /* 主内容 */
+        main {
+            margin-top: 100px;
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 练习卡片 */
+        .practice-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .practice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .practice-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .practice-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 练习内容 */
+        .practice-content {
+            margin-bottom: 2rem;
+        }
+
+        .practice-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .practice-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .practice-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .practice-item-title {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .practice-item-level {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background-color: #e7f3ff;
+            color: #3498db;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .practice-item-content {
+            margin-bottom: 1rem;
+        }
+
+        .sign-example {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            padding: 1rem;
+            text-align: center;
+            font-size: 3rem;
+            margin: 1rem 0;
+        }
+
+        .practice-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 练习统计 */
+        .practice-stats {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* 进度条 */
+        .progress-section {
+            margin-top: 2rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .practice-actions {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html" class="emergency-btn">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h1>每日手语练习</h1>
+                <p>每天10分钟，保持手语熟练度，提升沟通能力</p>
+            </div>
+
+            <!-- 练习卡片 -->
+            <div class="practice-card">
+                <div class="practice-header">
+                    <h2 class="practice-title">今日练习</h2>
+                    <span class="practice-date" id="currentDate"></span>
+                </div>
+
+                <div class="practice-content" id="practiceContent">
+                    <!-- 练习内容将通过JavaScript动态生成 -->
+                </div>
+
+                <div class="practice-actions">
+                    <button class="btn btn-primary" onclick="generateNewPractice()">生成新练习</button>
+                    <button class="btn btn-secondary" onclick="saveProgress()">保存进度</button>
+                    <button class="btn btn-success" onclick="markComplete()">标记完成</button>
+                </div>
+            </div>
+
+            <!-- 练习统计 -->
+            <div class="practice-stats">
+                <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">练习统计</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPractices">0</div>
+                        <div class="stat-label">总练习次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedPractices">0</div>
+                        <div class="stat-label">已完成练习</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="streakDays">0</div>
+                        <div class="stat-label">连续练习天数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="accuracyRate">0%</div>
+                        <div class="stat-label">练习准确率</div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <h3 style="margin-bottom: 1rem; color: #2c3e50;">本周练习进度</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="weeklyProgress" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-text" id="weeklyProgressText">0/7 天</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置当前日期
+            const currentDate = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('currentDate').textContent = currentDate.toLocaleDateString('zh-CN', options);
+            
+            // 生成今日练习
+            generateNewPractice();
+            
+            // 加载练习统计
+            loadPracticeStats();
+        });
+
+        // 练习内容库
+        const practiceLibrary = [
+            {
+                title: "问候语练习",
+                level: "初级",
+                content: "练习以下手语问候语：",
+                items: [
+                    { word: "你好", sign: "👋", description: "右手伸出，手掌向外，轻轻挥动" },
+                    { word: "谢谢", sign: "🙏", description: "双手合十，微微点头" },
+                    { word: "再见", sign: "👋", description: "右手伸出，手掌向外，左右挥动" },
+                    { word: "早上好", sign: "🌅", description: "右手比作太阳，从下往上移动" }
+                ]
+            },
+            {
+                title: "数字练习",
+                level: "初级",
+                content: "练习以下数字的手语表达：",
+                items: [
+                    { word: "1", sign: "☝️", description: "伸出食指" },
+                    { word: "2", sign: "✌️", description: "伸出食指和中指" },
+                    { word: "3", sign: "🤟", description: "伸出食指、中指和无名指" },
+                    { word: "4", sign: "🖖", description: "伸出食指、中指、无名指和小指" },
+                    { word: "5", sign: "🖐️", description: "伸出全部五根手指" }
+                ]
+            },
+            {
+                title: "家庭成员练习",
+                level: "中级",
+                content: "练习以下家庭成员的手语表达：",
+                items: [
+                    { word: "爸爸", sign: "👨", description: "右手放在下巴处，指尖向上" },
+                    { word: "妈妈", sign: "👩", description: "右手放在额头处，指尖向上" },
+                    { word: "哥哥", sign: "👦", description: "右手放在太阳穴处，指尖向上，然后向上移动" },
+                    { word: "姐姐", sign: "👧", description: "右手放在太阳穴处，指尖向上，然后向下移动" }
+                ]
+            },
+            {
+                title: "颜色练习",
+                level: "中级",
+                content: "练习以下颜色的手语表达：",
+                items: [
+                    { word: "红色", sign: "🔴", description: "右手食指指向嘴唇，然后向外移动" },
+                    { word: "蓝色", sign: "🔵", description: "右手食指指向太阳穴，然后向外移动" },
+                    { word: "绿色", sign: "🟢", description: "右手食指指向胸部，然后向外移动" },
+                    { word: "黄色", sign: "🟡", description: "右手食指指向脸颊，然后向外移动" }
+                ]
+            },
+            {
+                title: "日常用语练习",
+                level: "高级",
+                content: "练习以下日常用语的手语表达：",
+                items: [
+                    { word: "我很高兴", sign: "😊", description: "双手放在胸部，然后向外张开" },
+                    { word: "我不知道", sign: "🤷", description: "双手摊开，掌心向上" },
+                    { word: "请帮助我", sign: "🤝", description: "双手掌心向上，向前伸出" },
+                    { word: "我需要帮助", sign: "🆘", description: "右手放在胸部，然后向前伸出" }
+                ]
+            }
+        ];
+
+        // 生成新练习
+        function generateNewPractice() {
+            // 随机选择一个练习
+            const randomIndex = Math.floor(Math.random() * practiceLibrary.length);
+            const practice = practiceLibrary[randomIndex];
+            
+            // 生成练习内容
+            let practiceHTML = `
+                <div class="practice-item">
+                    <div class="practice-item-header">
+                        <h3 class="practice-item-title">${practice.title}</h3>
+                        <span class="practice-item-level">${practice.level}</span>
+                    </div>
+                    <div class="practice-item-content">
+                        <p>${practice.content}</p>
+                        <ul style="list-style-type: none; margin-top: 1rem;">
+            `;
+            
+            // 添加练习项目
+            practice.items.forEach(item => {
+                practiceHTML += `
+                    <li style="margin-bottom: 1.5rem;">
+                        <p style="font-weight: bold; margin-bottom: 0.5rem;">${item.word}</p>
+                        <div class="sign-example">${item.sign}</div>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">${item.description}</p>
+                    </li>
+                `;
+            });
+            
+            practiceHTML += `
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            // 更新练习内容
+            document.getElementById('practiceContent').innerHTML = practiceHTML;
+        }
+
+        // 保存进度
+        function saveProgress() {
+            // 获取当前用户
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            
+            // 获取当前练习数据
+            const practiceData = {
+                date: new Date().toISOString().split('T')[0],
+                completed: false,
+                timestamp: new Date().toISOString()
+            };
+            
+            // 从localStorage获取练习记录
+            const practiceRecords = JSON.parse(localStorage.getItem('practiceRecords')) || {};
+            
+            // 确保用户练习记录存在
+            if (!practiceRecords[userId]) {
+                practiceRecords[userId] = [];
+            }
+            
+            // 添加今天的练习记录
+            const today = new Date().toISOString().split('T')[0];
+            const existingRecordIndex = practiceRecords[userId].findIndex(record => record.date === today);
+            
+            if (existingRecordIndex > -1) {
+                practiceRecords[userId][existingRecordIndex] = practiceData;
+            } else {
+                practiceRecords[userId].push(practiceData);
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem('practiceRecords', JSON.stringify(practiceRecords));
+            
+            alert('练习进度已保存！');
+            
+            // 更新统计信息
+            loadPracticeStats();
+        }
+
+        // 标记完成
+        function markComplete() {
+            // 获取当前用户
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            
+            // 从localStorage获取练习记录
+            const practiceRecords = JSON.parse(localStorage.getItem('practiceRecords')) || {};
+            
+            // 确保用户练习记录存在
+            if (!practiceRecords[userId]) {
+                practiceRecords[userId] = [];
+            }
+            
+            // 更新今天的练习记录为已完成
+            const today = new Date().toISOString().split('T')[0];
+            const existingRecordIndex = practiceRecords[userId].findIndex(record => record.date === today);
+            
+            if (existingRecordIndex > -1) {
+                practiceRecords[userId][existingRecordIndex].completed = true;
+            } else {
+                practiceRecords[userId].push({
+                    date: today,
+                    completed: true,
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem('practiceRecords', JSON.stringify(practiceRecords));
+            
+            alert('练习已标记为完成！');
+            
+            // 更新统计信息
+            loadPracticeStats();
+        }
+
+        // 加载练习统计
+        function loadPracticeStats() {
+            // 获取当前用户
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : 'temp';
+            
+            // 从localStorage获取练习记录
+            const practiceRecords = JSON.parse(localStorage.getItem('practiceRecords')) || {};
+            const userRecords = practiceRecords[userId] || [];
+            
+            // 计算统计数据
+            const totalPractices = userRecords.length;
+            const completedPractices = userRecords.filter(record => record.completed).length;
+            const streakDays = calculateStreakDays(userRecords);
+            const accuracyRate = totalPractices > 0 ? Math.round((completedPractices / totalPractices) * 100) : 0;
+            
+            // 计算本周练习进度
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            
+            const weekPractices = userRecords.filter(record => {
+                const recordDate = new Date(record.date);
+                return recordDate >= weekStart;
+            });
+            
+            const weekCompleted = weekPractices.filter(record => record.completed).length;
+            const weekProgress = Math.min(Math.round((weekCompleted / 7) * 100), 100);
+            
+            // 更新统计显示
+            document.getElementById('totalPractices').textContent = totalPractices;
+            document.getElementById('completedPractices').textContent = completedPractices;
+            document.getElementById('streakDays').textContent = streakDays;
+            document.getElementById('accuracyRate').textContent = accuracyRate + '%';
+            document.getElementById('weeklyProgress').style.width = weekProgress + '%';
+            document.getElementById('weeklyProgressText').textContent = weekCompleted + '/7 天';
+        }
+
+        // 计算连续练习天数
+        function calculateStreakDays(records) {
+            if (records.length === 0) return 0;
+            
+            // 按日期排序
+            const sortedRecords = records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let i = 0; i < sortedRecords.length; i++) {
+                const recordDate = new Date(sortedRecords[i].date);
+                recordDate.setHours(0, 0, 0, 0);
+                
+                const daysDiff = Math.floor((today - recordDate) / (1000 * 60 * 60 * 24));
+                
+                if (daysDiff === i && sortedRecords[i].completed) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>

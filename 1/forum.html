@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手语论坛 - SignBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .emergency-btn {
+            background-color: #e74c3c;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emergency-btn:hover {
+            background-color: #c0392b !important;
+            color: white !important;
+        }
+
+        /* 主内容 */
+        main {
+            margin-top: 100px;
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 论坛布局 */
+        .forum-layout {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* 左侧边栏 */
+        .sidebar {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        /* 分类列表 */
+        .categories {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .categories h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .category-item a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .category-item a:hover {
+            color: #3498db;
+        }
+
+        .category-count {
+            background-color: #f0f0f0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        /* 热门话题 */
+        .hot-topics {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hot-topics h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .topic-list {
+            list-style: none;
+        }
+
+        .topic-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .topic-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .topic-item a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: block;
+        }
+
+        .topic-item a:hover {
+            color: #3498db;
+        }
+
+        /* 右侧内容 */
+        .content {
+            flex: 3;
+            min-width: 600px;
+        }
+
+        /* 发帖按钮 */
+        .post-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .post-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* 帖子列表 */
+        .posts {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+        }
+
+        .post-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        .post-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .post-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-title a {
+            color: #2c3e50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .post-title a:hover {
+            color: #3498db;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .post-content {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .action-btn:hover {
+            color: #3498db;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .page-btn:hover:not(.active) {
+            background-color: #f8f9fa;
+            border-color: #3498db;
+        }
+
+        .page-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 无帖子提示 */
+        .no-posts {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        /* 回复相关样式 */
+        .reply-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        .reply-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .reply-list {
+            margin-bottom: 2rem;
+        }
+
+        .reply-item {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border-left: 3px solid #3498db;
+        }
+
+        .reply-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .reply-author {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .reply-time {
+            color: #999;
+        }
+
+        .reply-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .reply-actions {
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #eee;
+        }
+
+        .reply-like-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .reply-like-btn:hover {
+            color: #3498db;
+        }
+
+        .reply-delete-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        .reply-delete-btn:hover {
+            color: #e74c3c;
+        }
+
+        .reply-form {
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 1rem;
+        }
+
+        .reply-form textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        /* 最高赞评论样式 */
+        .top-reply-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #ddd;
+        }
+
+        .top-reply {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #ff6b6b;
+            font-size: 0.9rem;
+        }
+
+        .top-reply-header {
+            margin-bottom: 0.6rem;
+        }
+
+        .top-reply-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .top-reply-content {
+            color: #444;
+        }
+
+        .top-reply-author {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        .top-reply-text {
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-size: 0.88rem;
+        }
+
+        .top-reply-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .top-reply-time {
+            opacity: 0.7;
+        }
+
+        .top-reply-likes {
+            font-weight: 500;
+        }
+
+        .reply-form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .reply-form-actions .btn {
+            padding: 0.6rem 1.2rem;
+        }
+
+        /* 帖子列表中的回复按钮样式 */
+        .post-item .reply-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+
+        .post-item .reply-section.active {
+            display: block;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .forum-layout {
+                flex-direction: column;
+            }
+
+            .sidebar,
+            .content {
+                min-width: 100%;
+            }
+
+            .post-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .post-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .auto-fill-info {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .auto-fill-info p {
+            margin: 0.3rem 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auto-fill-info strong {
+            color: #2c3e50;
+        }
+
+        /* 帖子详情模态框样式 */
+        .post-detail-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .post-detail-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        .post-detail-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .post-detail-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .post-detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        .post-detail-content-text {
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .post-detail-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-start;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .post-detail-actions .action-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .post-detail-actions .action-btn:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .post-detail-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .post-detail-close:hover {
+            color: #333;
+        }
+
+        /* 分享模态框样式 */
+        .share-content {
+            text-align: center;
+        }
+
+        .share-content h2 {
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+
+        .share-option:hover {
+            background: #e9ecef;
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .share-option span {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .share-link {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+            text-align: left;
+        }
+
+        .share-link label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .share-link input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .share-link button {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .post-detail-content {
+                width: 95%;
+                margin: 10% auto;
+                max-height: 90vh;
+            }
+
+            .post-detail-title {
+                font-size: 1.5rem;
+            }
+
+            .post-detail-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .post-detail-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .share-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html" class="emergency-btn">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h1>手语论坛</h1>
+                <p>与手语爱好者和专业人士交流，分享经验和资源</p>
+            </div>
+
+            <div class="forum-layout">
+                <!-- 左侧边栏 -->
+                <div class="sidebar">
+                    <!-- 分类列表 -->
+                    <div class="categories">
+                        <h2>论坛分类</h2>
+                        <ul class="category-list">
+                            <li class="category-item">
+                                <a href="#">
+                                    <span>手语学习</span>
+                                    <span class="category-count">128</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="#">
+                                    <span>翻译技巧</span>
+                                    <span class="category-count">89</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="#">
+                                    <span>文化交流</span>
+                                    <span class="category-count">67</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="#">
+                                    <span>设备讨论</span>
+                                    <span class="category-count">45</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="#">
+                                    <span>就业信息</span>
+                                    <span class="category-count">32</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="#">
+                                    <span>其他话题</span>
+                                    <span class="category-count">56</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 热门话题 -->
+                    <div class="hot-topics">
+                        <h2>热门话题</h2>
+                        <ul class="topic-list">
+                            <li class="topic-item">
+                                <a href="#">如何提高手语翻译准确率？</a>
+                            </li>
+                            <li class="topic-item">
+                                <a href="#">分享我的手语学习经验</a>
+                            </li>
+                            <li class="topic-item">
+                                <a href="#">最新手语设备推荐</a>
+                            </li>
+                            <li class="topic-item">
+                                <a href="#">手语在不同地区的差异</a>
+                            </li>
+                            <li class="topic-item">
+                                <a href="#">如何成为专业手语翻译？</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 右侧内容 -->
+                <div class="content">
+                    <!-- 发帖按钮 -->
+                    <button class="post-btn" id="post-btn">📝 发布新帖子</button>
+
+                    <!-- 帖子列表 -->
+                    <div class="posts">
+                        <div class="post-item">
+                            <div class="post-header">
+                                <div>
+                                    <h3 class="post-title"><a href="#">如何提高手语翻译的准确率？</a></h3>
+                                    <div class="post-meta">
+                                        <span>作者: 手语专家</span>
+                                        <span>发布时间: 2026-03-14</span>
+                                        <span>分类: 翻译技巧</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                大家好，我是一名专业手语翻译，想和大家分享一些提高手语翻译准确率的技巧。首先，了解不同地区手语的差异非常重要，其次，要注意观察说话者的面部表情和身体语言...
+                            </div>
+                            <div class="post-footer">
+                                <div class="post-meta">
+                                    <span>浏览: 234</span>
+                                    <span>回复: 45</span>
+                                </div>
+                                <div class="post-actions">
+                                    <button class="action-btn">👍 点赞 (28)</button>
+                                    <button class="action-btn">💬 回复</button>
+                                    <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="post-item">
+                            <div class="post-header">
+                                <div>
+                                    <h3 class="post-title"><a href="#">分享我的手语学习经验</a></h3>
+                                    <div class="post-meta">
+                                        <span>作者: 学习爱好者</span>
+                                        <span>发布时间: 2026-03-13</span>
+                                        <span>分类: 手语学习</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                我学习手语已经一年了，想和大家分享我的学习经验。刚开始学习时，我每天花30分钟练习基本手势，然后逐渐增加难度。使用SignBridge平台的学习模块对我帮助很大...
+                            </div>
+                            <div class="post-footer">
+                                <div class="post-meta">
+                                    <span>浏览: 189</span>
+                                    <span>回复: 32</span>
+                                </div>
+                                <div class="post-actions">
+                                    <button class="action-btn">👍 点赞 (19)</button>
+                                    <button class="action-btn">💬 回复</button>
+                                    <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="post-item">
+                            <div class="post-header">
+                                <div>
+                                    <h3 class="post-title"><a href="#">最新手语设备推荐</a></h3>
+                                    <div class="post-meta">
+                                        <span>作者: 科技爱好者</span>
+                                        <span>发布时间: 2026-03-12</span>
+                                        <span>分类: 设备讨论</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                最近我测试了几款最新的手语翻译设备，想和大家分享我的使用体验。其中一款智能手套可以实时捕捉手势并转换为文字，准确率达到了95%以上...
+                            </div>
+                            <div class="post-footer">
+                                <div class="post-meta">
+                                    <span>浏览: 256</span>
+                                    <span>回复: 48</span>
+                                </div>
+                                <div class="post-actions">
+                                    <button class="action-btn">👍 点赞 (31)</button>
+                                    <button class="action-btn">💬 回复</button>
+                                    <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="post-item">
+                            <div class="post-header">
+                                <div>
+                                    <h3 class="post-title"><a href="#">手语在不同地区的差异</a></h3>
+                                    <div class="post-meta">
+                                        <span>作者: 语言学者</span>
+                                        <span>发布时间: 2026-03-11</span>
+                                        <span>分类: 文化交流</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                手语在不同地区有很大的差异，即使在同一国家的不同地区也会有所不同。例如，中国手语在不同省份之间就有一些差异，这主要是由于地域文化和历史原因造成的...
+                            </div>
+                            <div class="post-footer">
+                                <div class="post-meta">
+                                    <span>浏览: 178</span>
+                                    <span>回复: 29</span>
+                                </div>
+                                <div class="post-actions">
+                                    <button class="action-btn">👍 点赞 (22)</button>
+                                    <button class="action-btn">💬 回复</button>
+                                    <button class="action-btn">🔗 分享</button>
+                                    <button class="action-btn delete-btn">🗑️ 删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <a href="#" class="page-btn">上一页</a>
+                        <a href="#" class="page-btn active">1</a>
+                        <a href="#" class="page-btn">2</a>
+                        <a href="#" class="page-btn">3</a>
+                        <a href="#" class="page-btn">4</a>
+                        <a href="#" class="page-btn">5</a>
+                        <a href="#" class="page-btn">下一页</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 发布新帖子模态框 -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 发布新帖子</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+
+            <div class="auto-fill-info">
+                <p><strong>作者:</strong> <span id="postAuthor">加载中...</span></p>
+                <p><strong>发布时间:</strong> <span id="postTime">自动获取</span></p>
+            </div>
+
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="postTitle">帖子标题 *</label>
+                    <input type="text" id="postTitle" name="title" placeholder="请输入帖子标题" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="postCategory">选择分类 *</label>
+                    <select id="postCategory" name="category" required>
+                        <option value="">请选择分类</option>
+                        <option value="手语学习">手语学习</option>
+                        <option value="翻译技巧">翻译技巧</option>
+                        <option value="文化交流">文化交流</option>
+                        <option value="设备讨论">设备讨论</option>
+                        <option value="就业信息">就业信息</option>
+                        <option value="其他话题">其他话题</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="postContent">帖子内容 *</label>
+                    <textarea id="postContent" name="content" placeholder="请输入帖子内容，分享您的想法和经验..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">取消</button>
+                    <button type="submit" class="btn btn-primary">发布帖子</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 帖子详情模态框 -->
+    <div id="postDetailModal" class="post-detail-modal">
+        <div class="post-detail-content">
+            <button class="post-detail-close" id="postDetailClose">&times;</button>
+            <div class="post-detail-header">
+                <h2 class="post-detail-title" id="detailTitle"></h2>
+                <div class="post-detail-meta">
+                    <span id="detailAuthor"></span>
+                    <span id="detailTime"></span>
+                    <span id="detailCategory"></span>
+                    <span id="detailViews"></span>
+                    <span id="detailReplies"></span>
+                </div>
+            </div>
+            <div class="post-detail-content-text" id="detailContent"></div>
+
+            <!-- 回复区域 -->
+            <div class="reply-section">
+                <h3 class="reply-title">💬 回复列表</h3>
+                <div class="reply-list" id="replyList">
+                    <!-- 回复列表将动态生成 -->
+                </div>
+
+                <!-- 回复表单 -->
+                <div class="reply-form">
+                    <textarea id="replyContent" placeholder="请输入您的回复内容..."></textarea>
+                    <div class="reply-form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelReplyBtn">取消</button>
+                        <button type="button" class="btn btn-primary" id="submitReplyBtn">发表回复</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="post-detail-actions">
+                <button class="action-btn" id="detailLikeBtn">👍 点赞 (0)</button>
+                <button class="action-btn" id="detailReplyBtn">💬 回复</button>
+                <button class="action-btn" id="detailShareBtn">🔗 分享</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分享模态框 -->
+    <div id="shareModal" class="post-detail-modal">
+        <div class="post-detail-content">
+            <button class="post-detail-close" id="shareClose">&times;</button>
+            <div class="share-content">
+                <h2>分享帖子</h2>
+                <div class="share-options">
+                    <div class="share-option" id="copyLinkBtn">
+                        <div class="share-icon">🔗</div>
+                        <span>复制链接</span>
+                    </div>
+                    <div class="share-option" id="shareWechatBtn">
+                        <div class="share-icon">💬</div>
+                        <span>微信分享</span>
+                    </div>
+                    <div class="share-option" id="shareQQBtn">
+                        <div class="share-icon">🐧</div>
+                        <span>QQ分享</span>
+                    </div>
+                    <div class="share-option" id="shareWeiboBtn">
+                        <div class="share-icon">📱</div>
+                        <span>微博分享</span>
+                    </div>
+                    <div class="share-option" id="shareFacebookBtn">
+                        <div class="share-icon">📘</div>
+                        <span>Facebook</span>
+                    </div>
+                    <div class="share-option" id="shareTwitterBtn">
+                        <div class="share-icon">🐦</div>
+                        <span>Twitter</span>
+                    </div>
+                </div>
+                <div class="share-link">
+                    <label for="shareLinkInput">帖子链接：</label>
+                    <input type="text" id="shareLinkInput" readonly>
+                    <button class="btn btn-sm btn-primary" id="copyLinkInputBtn">复制</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('help')">帮助中心</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('contact')">联系我们</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('privacy')">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 论坛功能
+        document.addEventListener('DOMContentLoaded', function () {
+            // 修复：定义缺失的元素
+            const postAuthor = document.getElementById('postAuthor');
+
+            // 模态框相关元素
+            const postModal = document.getElementById('postModal');
+            const postBtn = document.getElementById('post-btn');
+            const modalClose = document.getElementById('modalClose');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const postForm = document.getElementById('postForm');
+            const postTime = document.getElementById('postTime');
+            const posts = document.querySelector('.posts');
+
+            // 帖子详情模态框相关元素
+            const postDetailModal = document.getElementById('postDetailModal');
+            const postDetailClose = document.getElementById('postDetailClose');
+            const detailTitle = document.getElementById('detailTitle');
+            const detailAuthor = document.getElementById('detailAuthor');
+            const detailTime = document.getElementById('detailTime');
+            const detailCategory = document.getElementById('detailCategory');
+            const detailViews = document.getElementById('detailViews');
+            const detailReplies = document.getElementById('detailReplies');
+            const detailContent = document.getElementById('detailContent');
+            const detailLikeBtn = document.getElementById('detailLikeBtn');
+            const detailReplyBtn = document.getElementById('detailReplyBtn');
+            const detailShareBtn = document.getElementById('detailShareBtn');
+
+            // 回复相关元素
+            const replyList = document.getElementById('replyList');
+            const replyContent = document.getElementById('replyContent');
+            const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+            const submitReplyBtn = document.getElementById('submitReplyBtn');
+
+            // 当前查看的帖子ID
+            let currentPostId = null;
+
+            // 打开模态框
+            postBtn.addEventListener('click', function () {
+                // 获取当前登录用户信息
+                const user = JSON.parse(localStorage.getItem('user')) || { username: '游客' };
+                postAuthor.textContent = user.username;
+
+                // 更新发布时间
+                const now = new Date();
+                const timeString = now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0') + ' ' +
+                    String(now.getHours()).padStart(2, '0') + ':' +
+                    String(now.getMinutes()).padStart(2, '0');
+                postTime.textContent = timeString;
+
+                // 显示模态框
+                postModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            });
+
+            // 关闭模态框函数
+            function closeModal() {
+                postModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                postForm.reset();
+            }
+
+            // 关闭按钮点击
+            modalClose.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+
+            // 点击模态框外部关闭
+            window.addEventListener('click', function (e) {
+                if (e.target === postModal) closeModal();
+                if (e.target === postDetailModal) closePostDetailModal();
+                if (e.target === shareModal) shareModal.style.display = 'none';
+            });
+
+            // 表单提交
+            postForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // 获取表单数据
+                const title = document.getElementById('postTitle').value.trim();
+                const category = document.getElementById('postCategory').value;
+                const content = document.getElementById('postContent').value.trim();
+                const author = postAuthor.textContent;
+                const time = postTime.textContent;
+
+                // 验证表单
+                if (!title || !category || !content) {
+                    alert('请填写所有必填字段');
+                    return;
+                }
+
+                // 关闭模态框
+                closeModal();
+
+                // 创建新帖子数据
+                const newPostData = {
+                    title: title,
+                    content: content,
+                    author: '作者: ' + author,
+                    time: '发布时间: ' + time,
+                    category: '分类: ' + category,
+                    views: '浏览: 0',
+                    replies: '回复: 0',
+                    likes: '0'
+                };
+
+                // 添加新帖子到列表
+                addNewPost(newPostData);
+
+                // 显示成功提示
+                alert('帖子发布成功！');
+
+                // 滚动到新帖子
+                const firstPost = document.querySelector('.post-item');
+                if (firstPost) {
+                    firstPost.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            // 分类点击
+            let currentCategory = null;
+            let filteredPosts = [];
+
+            const categoryLinks = document.querySelectorAll('.category-item a');
+            categoryLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const categoryName = this.querySelector('span').textContent.trim();
+
+                    // 如果点击的是当前分类，则取消筛选
+                    if (currentCategory === categoryName) {
+                        currentCategory = null;
+                        this.style.fontWeight = 'normal';
+                        this.style.color = '';
+                    } else {
+                        // 更新当前分类
+                        currentCategory = categoryName;
+
+                        // 更新分类链接的样式
+                        categoryLinks.forEach(l => {
+                            l.style.fontWeight = 'normal';
+                            l.style.color = '';
+                        });
+                        this.style.fontWeight = 'bold';
+                        this.style.color = '#3498db';
+                    }
+
+                    // 筛选帖子
+                    filterPostsByCategory();
+
+                    // 显示第一页
+                    showPage(1);
+                });
+            });
+
+            // 根据分类筛选帖子
+            function filterPostsByCategory() {
+                if (currentCategory) {
+                    filteredPosts = allPosts.filter(post => {
+                        return post.category === '分类: ' + currentCategory;
+                    });
+                } else {
+                    filteredPosts = allPosts;
+                }
+            }
+
+            // 热门话题点击
+            const topicLinks = document.querySelectorAll('.topic-item a');
+            topicLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const topicTitle = this.textContent.trim();
+
+                    // 查找对应的帖子
+                    const postItems = document.querySelectorAll('.post-item');
+                    let targetPost = null;
+
+                    postItems.forEach(post => {
+                        const postTitle = post.querySelector('.post-title a').textContent.trim();
+
+                        // 清理标题用于比较（移除标点符号和空格）
+                        const cleanTopicTitle = topicTitle.replace(/[？。！，、\s]/g, '');
+                        const cleanPostTitle = postTitle.replace(/[？。！，、\s]/g, '');
+
+                        // 多种匹配方式
+                        const isMatch =
+                            postTitle === topicTitle || // 完全匹配
+                            postTitle.includes(topicTitle) || // 帖子标题包含话题标题
+                            topicTitle.includes(postTitle) || // 话题标题包含帖子标题
+                            cleanPostTitle.includes(cleanTopicTitle) || // 清理后匹配
+                            cleanTopicTitle.includes(cleanPostTitle) ||
+                            // 相似度匹配（计算共同字符比例）
+                            calculateSimilarity(cleanPostTitle, cleanTopicTitle) > 0.6;
+
+                        if (isMatch) {
+                            targetPost = post;
+                        }
+                    });
+
+                    if (targetPost) {
+                        // 滚动到对应帖子
+                        targetPost.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // 高亮显示帖子
+                        targetPost.style.backgroundColor = '#e3f2fd';
+                        targetPost.style.transition = 'background-color 0.5s ease';
+
+                        // 3秒后恢复原始背景色
+                        setTimeout(() => {
+                            targetPost.style.backgroundColor = '';
+                        }, 3000);
+
+                        // 打开帖子详情
+                        setTimeout(() => {
+                            openPostDetail(targetPost);
+                        }, 500);
+                    } else {
+                        alert('未找到对应的话题帖子: ' + topicTitle);
+                    }
+                });
+            });
+
+            // 计算字符串相似度（Levenshtein距离简化版）
+            function calculateSimilarity(str1, str2) {
+                const longer = str1.length > str2.length ? str1 : str2;
+                const shorter = str1.length > str2.length ? str2 : str1;
+
+                if (longer.length === 0) return 1.0;
+
+                // 计算共同字符数
+                let commonChars = 0;
+                const shorterChars = shorter.split('');
+                const longerChars = longer.split('');
+
+                for (let char of shorterChars) {
+                    const index = longerChars.indexOf(char);
+                    if (index !== -1) {
+                        commonChars++;
+                        longerChars.splice(index, 1);
+                    }
+                }
+
+                return commonChars / longer.length;
+            }
+
+            // 帖子标题点击
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.post-title a')) {
+                    e.preventDefault();
+                    openPostDetail(e.target.closest('.post-item'));
+                }
+            });
+
+            // 帖子操作按钮
+            document.addEventListener('click', function (e) {
+                const btn = e.target.closest('.action-btn');
+                if (!btn) return;
+
+                const postItem = btn.closest('.post-item');
+                const postId = postItem.getAttribute('data-post-id') || postItem.querySelector('.post-title a').textContent;
+                const user = JSON.parse(localStorage.getItem('user'));
+                const userId = user ? user.id : 'guest';
+
+                // 检测是否是删除按钮
+                if (btn.textContent.includes('🗑️ 删除') || btn.innerHTML.includes('🗑️')) {
+                    const postTitle = postItem.querySelector('.post-title a').textContent;
+                    const postData = allPosts.find(post => post.title === postTitle);
+                    if (postData) deletePost(postData, postItem);
+                }
+                // 检测是否是点赞按钮（包括点赞和已点赞状态）
+                else if (btn.textContent.includes('点赞') || btn.innerHTML.includes('👍') || btn.innerHTML.includes('❤️')) {
+                    // 使用数据库操作切换点赞状态
+                    const result = togglePostLike(postId, userId);
+
+                    // 更新按钮显示
+                    if (result.liked) {
+                        btn.innerHTML = `❤️ 已点赞 (${result.count})`;
+                        btn.style.color = '#e74c3c';
+                    } else {
+                        btn.innerHTML = `👍 点赞 (${result.count})`;
+                        btn.style.color = '';
+                    }
+
+                    // 更新帖子数据中的点赞数
+                    const postTitle = postItem.querySelector('.post-title a').textContent;
+                    const postIndex = allPosts.findIndex(p => p.title === postTitle);
+                    if (postIndex !== -1) {
+                        allPosts[postIndex].likes = result.count.toString();
+                        savePostsToStorage();
+                    }
+
+                    // 弹出提示
+                    showLikeToast(btn, result.liked);
+                } else if (btn.textContent.includes('💬 回复') || btn.innerHTML.includes('💬')) {
+                    openPostDetail(postItem);
+                    setTimeout(() => replyContent.focus(), 100);
+                } else if (btn.textContent.includes('🔗 分享') || btn.innerHTML.includes('🔗')) {
+                    openPostDetail(postItem);
+                    setTimeout(() => detailShareBtn.click(), 100);
+                }
+            });
+
+            // 点赞成功提示浮窗函数
+            function showLikeToast(button, liked) {
+                // 创建提示元素
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: ${liked ? 'rgba(39, 174, 96, 0.95)' : 'rgba(149, 165, 166, 0.95)'};
+                    color: white;
+                    padding: 15px 30px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    z-index: 9999;
+                    animation: fadeInOut 1.5s ease-in-out;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                `;
+                toast.textContent = liked ? '❤️ 点赞成功！' : '👍 已取消点赞';
+
+                // 添加动画样式
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fadeInOut {
+                        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                        20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                        80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                        100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                    }
+                `;
+                document.head.appendChild(style);
+                document.body.appendChild(toast);
+
+                // 动画结束后移除元素
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 1500);
+            }
+
+            // 打开帖子详情函数
+            function openPostDetail(postItem) {
+                // 获取帖子信息
+                const title = postItem.querySelector('.post-title a').textContent;
+                const content = postItem.querySelector('.post-content').innerHTML;
+
+                // 生成帖子ID（使用标题作为简单ID）
+                currentPostId = title;
+
+                // 获取当前用户信息
+                const user = JSON.parse(localStorage.getItem('user'));
+                const userId = user ? user.id : 'guest';
+
+                // 解析元信息
+                let author = '';
+                let time = '';
+                let category = '';
+                let views = '浏览: 0';
+                let replies = '回复: 0';
+
+                // 解析作者、时间、分类
+                const metaSpans = postItem.querySelectorAll('.post-header .post-meta span');
+                metaSpans.forEach(span => {
+                    const text = span.textContent;
+                    if (text.includes('作者:')) author = text;
+                    else if (text.includes('发布时间:')) time = text;
+                    else if (text.includes('分类:')) category = text;
+                });
+
+                // 解析浏览和回复
+                const footerSpans = postItem.querySelectorAll('.post-footer .post-meta span');
+                footerSpans.forEach(span => {
+                    const text = span.textContent;
+                    if (text.includes('浏览:')) views = text;
+                    else if (text.includes('回复:')) replies = text;
+                });
+
+                // 获取点赞数（从数据库）
+                const likes = getPostLikes(currentPostId);
+                const isLiked = hasUserLikedPost(currentPostId, userId);
+
+                // 更新详情模态框
+                detailTitle.textContent = title;
+                detailAuthor.textContent = author;
+                detailTime.textContent = time;
+                detailCategory.textContent = category;
+                detailViews.textContent = views;
+                detailReplies.textContent = replies;
+                detailContent.innerHTML = content;
+
+                // 设置点赞按钮状态
+                if (isLiked) {
+                    detailLikeBtn.innerHTML = `❤️ 已点赞 (${likes})`;
+                    detailLikeBtn.style.color = '#e74c3c';
+                } else {
+                    detailLikeBtn.innerHTML = `👍 点赞 (${likes})`;
+                    detailLikeBtn.style.color = '';
+                }
+
+                // 加载回复列表
+                loadReplies(currentPostId);
+
+                // 清空回复输入框
+                replyContent.value = '';
+
+                // 显示模态框
+                postDetailModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            // 关闭帖子详情模态框
+            function closePostDetailModal() {
+                postDetailModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            // 关闭按钮点击
+            postDetailClose.addEventListener('click', closePostDetailModal);
+
+            // 帖子详情模态框中的按钮事件
+            detailLikeBtn.addEventListener('click', function () {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const userId = user ? user.id : 'guest';
+
+                // 使用数据库操作切换点赞状态
+                const result = togglePostLike(currentPostId, userId);
+
+                // 更新按钮显示
+                if (result.liked) {
+                    this.innerHTML = `❤️ 已点赞 (${result.count})`;
+                    this.style.color = '#e74c3c';
+                } else {
+                    this.innerHTML = `👍 点赞 (${result.count})`;
+                    this.style.color = '';
+                }
+
+                // 更新帖子列表中的点赞数
+                document.querySelectorAll('.post-item').forEach(item => {
+                    const postTitle = item.querySelector('.post-title a').textContent;
+                    if (postTitle === currentPostId) {
+                        const likeBtn = item.querySelector('.action-btn:nth-child(1)');
+                        if (likeBtn) {
+                            if (result.liked) {
+                                likeBtn.innerHTML = `❤️ 已点赞 (${result.count})`;
+                                likeBtn.style.color = '#e74c3c';
+                            } else {
+                                likeBtn.innerHTML = `👍 点赞 (${result.count})`;
+                                likeBtn.style.color = '';
+                            }
+                        }
+                    }
+                });
+
+                // 更新帖子数据
+                const postIndex = allPosts.findIndex(p => p.title === currentPostId);
+                if (postIndex !== -1) {
+                    allPosts[postIndex].likes = result.count.toString();
+                    savePostsToStorage();
+                }
+
+                showLikeToast(this, result.liked);
+            });
+
+            detailReplyBtn.addEventListener('click', function () {
+                replyContent.focus();
+                replyContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            // 分享功能
+            const shareModal = document.getElementById('shareModal');
+            const shareClose = document.getElementById('shareClose');
+            const copyLinkBtn = document.getElementById('copyLinkBtn');
+            const shareWechatBtn = document.getElementById('shareWechatBtn');
+            const shareQQBtn = document.getElementById('shareQQBtn');
+            const shareWeiboBtn = document.getElementById('shareWeiboBtn');
+            const shareFacebookBtn = document.getElementById('shareFacebookBtn');
+            const shareTwitterBtn = document.getElementById('shareTwitterBtn');
+            const shareLinkInput = document.getElementById('shareLinkInput');
+            const copyLinkInputBtn = document.getElementById('copyLinkInputBtn');
+
+            // 打开分享模态框
+            detailShareBtn.addEventListener('click', function () {
+                const postTitle = detailTitle.textContent;
+                const currentUrl = window.location.href;
+                const shareLink = `${currentUrl}#post-${encodeURIComponent(postTitle)}`;
+                shareLinkInput.value = shareLink;
+                shareModal.style.display = 'block';
+            });
+
+            // 关闭分享模态框
+            shareClose.addEventListener('click', () => shareModal.style.display = 'none');
+
+            // 复制链接
+            function copyLink() {
+                shareLinkInput.select();
+                navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+                    alert('链接已复制到剪贴板！');
+                }).catch(err => {
+                    alert('复制失败，请手动复制！');
+                });
+            }
+
+            copyLinkBtn.addEventListener('click', copyLink);
+            copyLinkInputBtn.addEventListener('click', copyLink);
+
+            // 社交分享
+            shareWechatBtn.addEventListener('click', () => alert('请使用微信扫描二维码分享'));
+            shareQQBtn.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(detailTitle.textContent);
+                window.open(`https://connect.qq.com/widget/shareqq?url=${url}&title=${title}`, '_blank');
+            });
+            shareWeiboBtn.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(detailTitle.textContent);
+                window.open(`https://service.weibo.com/share?url=${url}&title=${title}`, '_blank');
+            });
+            shareFacebookBtn.addEventListener('click', () => {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+            });
+            shareTwitterBtn.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(detailTitle.textContent);
+                window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
+            });
+
+            // 回复功能
+            function loadReplies(postId) {
+                replyList.innerHTML = '';
+                const replies = getPostReplies(postId);
+                const user = JSON.parse(localStorage.getItem('user'));
+                const userId = user ? user.id : 'guest';
+
+                if (replies.length === 0) {
+                    replyList.innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">暂无回复，快来发表第一条回复吧！</p>';
+                    return;
+                }
+
+                replies.forEach(reply => {
+                    const isLiked = hasUserLikedReply(postId, reply.id, userId);
+                    const el = document.createElement('div');
+                    el.className = 'reply-item';
+                    el.setAttribute('data-reply-id', reply.id);
+                    el.innerHTML = `
+                        <div class="reply-header">
+                            <span class="reply-author">${reply.author}</span>
+                            <span class="reply-time">${reply.time}</span>
+                        </div>
+                        <div class="reply-content">${reply.content}</div>
+                        <div class="reply-actions">
+                            <button class="reply-like-btn" data-reply-id="${reply.id}" ${isLiked ? 'style="color: #e74c3c;"' : ''}>
+                                ${isLiked ? '❤️' : '👍'} 点赞 (${reply.likes})
+                            </button>
+                            <button class="reply-delete-btn" data-reply-id="${reply.id}">
+                                🗑️ 删除
+                            </button>
+                        </div>
+                    `;
+                    replyList.appendChild(el);
+                });
+
+                // 绑定回复点赞事件
+                bindReplyEvents();
+            }
+
+            function submitReply() {
+                const content = replyContent.value.trim();
+                if (!content) return alert('请输入回复内容');
+
+                const user = JSON.parse(localStorage.getItem('user')) || { username: '游客' };
+
+                // 使用数据库添加回复
+                addReply(currentPostId, user.username, content);
+
+                loadReplies(currentPostId);
+                updateReplyCount(currentPostId);
+                replyContent.value = '';
+                alert('回复发表成功！');
+            }
+
+            function updateReplyCount(postId) {
+                const count = getPostReplies(postId).length;
+                detailReplies.textContent = `回复: ${count}`;
+
+                document.querySelectorAll('.post-item').forEach(item => {
+                    if (item.querySelector('.post-title a').textContent === postId) {
+                        item.querySelector('.post-footer .post-meta span:nth-child(2)').textContent = `回复: ${count}`;
+                    }
+                });
+
+                const idx = allPosts.findIndex(p => p.title === postId);
+                if (idx !== -1) allPosts[idx].replies = `回复: ${count}`;
+
+                savePostsToStorage();
+            }
+
+            // 绑定回复事件
+            function bindReplyEvents() {
+                // 绑定回复点赞事件
+                const replyLikeBtns = document.querySelectorAll('.reply-like-btn');
+                replyLikeBtns.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const replyId = parseInt(this.getAttribute('data-reply-id'));
+                        const user = JSON.parse(localStorage.getItem('user'));
+                        const userId = user ? user.id : 'guest';
+
+                        // 使用数据库操作切换回复点赞状态
+                        const result = toggleReplyLike(currentPostId, replyId, userId);
+
+                        // 更新按钮显示
+                        if (result.liked) {
+                            this.innerHTML = `❤️ 点赞 (${result.count})`;
+                            this.style.color = '#e74c3c';
+                        } else {
+                            this.innerHTML = `👍 点赞 (${result.count})`;
+                            this.style.color = '';
+                        }
+
+                        showLikeToast(this, result.liked);
+                    });
+                });
+
+                // 绑定回复删除事件
+                const replyDeleteBtns = document.querySelectorAll('.reply-delete-btn');
+                replyDeleteBtns.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const replyId = parseInt(this.getAttribute('data-reply-id'));
+
+                        // 弹出密码输入框
+                        const pwd = prompt('请输入删除密码（默认：123）');
+                        if (pwd === null) return; // 用户取消
+
+                        if (pwd !== '123') {
+                            alert('密码错误！');
+                            return;
+                        }
+
+                        // 确认删除
+                        if (!confirm('确定删除这条评论？')) {
+                            return;
+                        }
+
+                        // 删除评论
+                        deleteReply(currentPostId, replyId)
+                            .then(success => {
+                                if (success) {
+                                    alert('删除成功！');
+                                    loadReplies(currentPostId);
+                                    updateReplyCount(currentPostId);
+                                } else {
+                                    alert('删除失败，请重试');
+                                }
+                            })
+                            .catch(() => {
+                                alert('删除失败，请重试');
+                            });
+                    });
+                });
+            }
+
+            cancelReplyBtn.addEventListener('click', () => replyContent.value = '');
+            submitReplyBtn.addEventListener('click', submitReply);
+            replyContent.addEventListener('keydown', e => {
+                if (e.ctrlKey && e.key === 'Enter') submitReply();
+            });
+
+            // 分页 & 数据存储
+            const pageSize = 5;
+            let currentPage = 1;
+            let allPosts = [];
+
+            function initPosts() {
+                const saved = localStorage.getItem('forumPosts');
+                if (saved) allPosts = JSON.parse(saved);
+
+                document.querySelectorAll('.post-item').forEach(item => {
+                    const title = item.querySelector('.post-title a').textContent;
+                    if (allPosts.some(p => p.title === title)) return;
+
+                    const content = item.querySelector('.post-content').innerHTML;
+                    let author, time, category, views, replies, likes;
+
+                    item.querySelectorAll('.post-header .post-meta span').forEach(s => {
+                        if (s.textContent.includes('作者:')) author = s.textContent;
+                        if (s.textContent.includes('发布时间:')) time = s.textContent;
+                        if (s.textContent.includes('分类:')) category = s.textContent;
+                    });
+
+                    item.querySelectorAll('.post-footer .post-meta span').forEach(s => {
+                        if (s.textContent.includes('浏览:')) views = s.textContent;
+                        if (s.textContent.includes('回复:')) replies = s.textContent;
+                    });
+
+                    likes = item.querySelector('.action-btn:nth-child(1)').textContent.match(/\((\d+)\)/)?.[1] || '0';
+
+                    allPosts.push({ title, content, author, time, category, views, replies, likes });
+                });
+
+                allPosts.sort((a, b) => new Date(b.time.replace('发布时间: ', '')) - new Date(a.time.replace('发布时间: ', '')));
+                savePostsToStorage();
+                showPage(1);
+            }
+
+            function savePostsToStorage() {
+                localStorage.setItem('forumPosts', JSON.stringify(allPosts));
+            }
+
+            function showPage(page) {
+                currentPage = page;
+                const container = document.querySelector('.posts');
+                container.innerHTML = '';
+
+                const show = currentCategory ? filteredPosts : allPosts;
+                const pageData = show.slice((page - 1) * pageSize, page * pageSize);
+
+                // 获取当前用户信息
+                const user = JSON.parse(localStorage.getItem('user'));
+                const userId = user ? user.id : 'guest';
+
+                if (pageData.length === 0) {
+                    container.innerHTML = '<div class="no-posts">当前页面没有帖子</div>';
+                    updatePagination();
+                    return;
+                }
+
+                pageData.forEach(data => {
+                    // 获取帖子点赞状态
+                    const postId = data.title;
+                    const likes = getPostLikes(postId);
+                    const isLiked = hasUserLikedPost(postId, userId);
+
+                    const el = document.createElement('div');
+                    el.className = 'post-item';
+                    el.setAttribute('data-post-id', postId);
+                    el.innerHTML = `
+                        <div class="post-header">
+                            <div>
+                                <h3 class="post-title"><a href="#">${data.title}</a></h3>
+                                <div class="post-meta">
+                                    <span>${data.author}</span>
+                                    <span>${data.time}</span>
+                                    <span>${data.category}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">${data.content}</div>
+                        <div class="post-footer">
+                            <div class="post-meta">
+                                <span>${data.views}</span>
+                                <span>${data.replies}</span>
+                            </div>
+                            <div class="post-actions">
+                                <button class="action-btn" ${isLiked ? 'style="color: #e74c3c;"' : ''}>
+                                    ${isLiked ? '❤️ 已点赞' : '👍 点赞'} (${likes})
+                                </button>
+                                <button class="action-btn">💬 回复</button>
+                                <button class="action-btn">🔗 分享</button>
+                                <button class="action-btn delete-btn">🗑️ 删除</button>
+                            </div>
+                        </div>
+                        <div class="top-reply-section" id="top-reply-${encodeURIComponent(postId)}"></div>
+                    `;
+                    container.appendChild(el);
+
+                    // 渲染最高赞评论
+                    const topReplyContainer = document.getElementById(`top-reply-${encodeURIComponent(postId)}`);
+                    renderTopReply(postId, topReplyContainer);
+                });
+
+                updatePagination();
+            }
+
+            function updatePagination() {
+                const container = document.querySelector('.pagination');
+                container.innerHTML = '';
+                const total = Math.ceil((currentCategory ? filteredPosts : allPosts).length / pageSize);
+
+                const prev = document.createElement('a');
+                prev.className = 'page-btn';
+                prev.textContent = '上一页';
+                prev.onclick = e => {
+                    e.preventDefault();
+                    if (currentPage > 1) showPage(currentPage - 1);
+                };
+                container.appendChild(prev);
+
+                for (let i = 1; i <= total; i++) {
+                    const btn = document.createElement('a');
+                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                    btn.textContent = i;
+                    btn.onclick = e => {
+                        e.preventDefault();
+                        showPage(i);
+                    };
+                    container.appendChild(btn);
+                }
+
+                const next = document.createElement('a');
+                next.className = 'page-btn';
+                next.textContent = '下一页';
+                next.onclick = e => {
+                    e.preventDefault();
+                    if (currentPage < total) showPage(currentPage + 1);
+                };
+                container.appendChild(next);
+            }
+
+            function addNewPost(data) {
+                allPosts.unshift(data);
+                savePostsToStorage();
+                showPage(1);
+            }
+
+            function deletePost(data, el) {
+                const pwd = prompt('请输入删除密码（默认：123）');
+                if (pwd === '123') {
+                    if (confirm('确定删除？不可恢复！')) {
+                        allPosts = allPosts.filter(p => p.title !== data.title);
+                        savePostsToStorage();
+                        showPage(currentPage);
+                        alert('删除成功');
+                    }
+                } else if (pwd !== null) alert('密码错误');
+            }
+
+            initPosts();
+            filteredPosts = allPosts;
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>

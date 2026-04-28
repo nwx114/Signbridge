@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignBridge - 智能手语交流平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .emergency-btn {
+            background-color: #e74c3c;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emergency-btn:hover {
+            background-color: #c0392b !important;
+            color: white !important;
+        }
+
+        /* 英雄区域 */
+        .hero {
+            position: relative;
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 62, 80, 0.7);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: white;
+            color: #3498db;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 功能特点 */
+        .features {
+            padding: 80px 0;
+            background-color: white;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: #f9f9f9;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        /* 技术演示 */
+        .demo {
+            padding: 80px 0;
+            background-color: white;
+        }
+
+        .demo h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .demo-description {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #666;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .demo-card {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .demo-card img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .demo-card p {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        /* 关于我们 */
+        .about {
+            padding: 80px 0;
+            background-color: #f5f5f5;
+        }
+
+        .about-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .about-text p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .about-image {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 80%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html" class="emergency-btn">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="sp/a_1wwflj0et1aysuh616757507108393_10s.mp4" type="video/mp4">
+            您的浏览器不支持视频播放
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="container">
+            <h1>SignBridge</h1>
+            <p>连接听障人士与健听人士的智能手语交流平台，让沟通无障碍</p>
+            <div class="cta-buttons">
+                <a href="translate.html" class="btn btn-primary">开始翻译</a>
+                <a href="learn.html" class="btn btn-secondary">学习手语</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特点 -->
+    <section class="features">
+        <div class="container">
+            <h2>核心功能</h2>
+            <div class="features-grid">
+                <div class="feature-card" data-href="translate.html" style="cursor: pointer;">
+                    <div class="feature-icon">🔄</div>
+                    <h3>实时手语翻译</h3>
+                    <p>利用先进的AI技术，实时将手语转换为文字和语音，实现无障碍交流</p>
+                </div>
+                <div class="feature-card" data-href="learn.html" style="cursor: pointer;">
+                    <div class="feature-icon">📚</div>
+                    <h3>手语学习系统</h3>
+                    <p>提供系统化的手语学习课程，从基础到高级，适合不同水平的学习者</p>
+                </div>
+                <div class="feature-card" data-href="forum.html" style="cursor: pointer;">
+                    <div class="feature-icon">💬</div>
+                    <h3>手语交流论坛</h3>
+                    <p>搭建手语爱好者和专业人士的交流平台，分享经验和资源</p>
+                </div>
+                <div class="feature-card" data-href="emergency.html" style="cursor: pointer;">
+                    <div class="feature-icon">🚨</div>
+                    <h3>紧急求助服务</h3>
+                    <p>为听障人士提供紧急情况下的快速求助通道，确保安全</p>
+                </div>
+                <div class="feature-card" data-href="profile.html" style="cursor: pointer;">
+                    <div class="feature-icon">👤</div>
+                    <h3>个人学习中心</h3>
+                    <p>个性化学习进度跟踪，智能推荐学习内容，提升学习效率</p>
+                </div>
+                <div class="feature-card" data-href="translate.html" style="cursor: pointer;">
+                    <div class="feature-icon">🌐</div>
+                    <h3>多语言支持</h3>
+                    <p>支持多种语言的手语翻译，满足不同地区用户的需求</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技术演示 -->
+    <section class="demo">
+        <div class="container">
+            <h2>技术演示</h2>
+            <p class="demo-description">通过实际演示了解SignBridge的手语识别和翻译功能</p>
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <img src="img/demo.gif" alt="手语识别演示1">
+                    <p>实时手势识别与翻译</p>
+                </div>
+                <div class="demo-card">
+                    <img src="img/demo2.gif" alt="手语识别演示2">
+                    <p>手部动作分析</p>
+                </div>
+                <div class="demo-card">
+                    <img src="img/demo3.gif" alt="手语识别演示3">
+                    <p>手势预测系统</p>
+                </div>
+                <div class="demo-card">
+                    <img src="img/demo4.gif" alt="手语识别演示4">
+                    <p>多手势识别</p>
+                </div>
+                <div class="demo-card">
+                    <img src="img/demo5.gif" alt="手语识别演示5">
+                    <p>文本模式输出</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>关于 SignBridge</h2>
+                    <p>SignBridge 是一个致力于消除听障人士与健听人士之间沟通障碍的智能平台。我们利用先进的人工智能技术，为用户提供实时、准确的手语翻译服务。</p>
+                    <p>同时，我们还构建了完善的手语学习系统，帮助更多人了解和掌握手语，促进社会对听障人士的理解和包容。</p>
+                    <p>我们的使命是通过技术创新，创造一个无障碍的沟通环境，让每个人都能自由表达和交流。</p>
+                </div>
+                <div class="about-image">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sign%20language%20communication%20technology%20platform%2C%20modern%20interface%2C%20inclusive%20design&image_size=landscape_16_9"
+                        alt="SignBridge 平台">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('help')">帮助中心</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('contact')">联系我们</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('privacy')">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+</html>

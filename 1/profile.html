@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - SignBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .emergency-btn {
+            background-color: #e74c3c;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emergency-btn:hover {
+            background-color: #c0392b !important;
+            color: white !important;
+        }
+
+        /* 主内容 */
+        main {
+            margin-top: 100px;
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 个人中心布局 */
+        .profile-layout {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* 左侧边栏 */
+        .profile-sidebar {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* 用户信息卡片 */
+        .user-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-level {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background-color: #e7f3ff;
+            color: #3498db;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat {
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .edit-profile-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* 导航菜单 */
+        .nav-menu {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-menu-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-menu-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .nav-menu-item.active {
+            background-color: #e7f3ff;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .nav-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 右侧内容 */
+        .profile-content {
+            flex: 3;
+            min-width: 600px;
+        }
+
+        /* 内容卡片 */
+        .content-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .content-card h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        /* 学习进度 */
+        .progress-section {
+            margin-bottom: 2rem;
+        }
+
+        .progress-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 5px;
+        }
+
+        /* 最近活动 */
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            min-width: 40px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* 设置表单 */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .profile-layout {
+                flex-direction: column;
+            }
+
+            .profile-sidebar,
+            .profile-content {
+                min-width: 100%;
+            }
+
+            .user-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">SignBridge</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="translate.html">实时翻译</a></li>
+                    <li><a href="learn.html">手语学习</a></li>
+                    <li><a href="forum.html">手语论坛</a></li>
+                    <li><a href="emergency.html" class="emergency-btn">紧急求助</a></li>
+                    <li><a href="profile.html">个人中心</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h1>个人中心</h1>
+                <p>管理您的账户信息和学习进度</p>
+            </div>
+
+            <div class="profile-layout">
+                <!-- 左侧边栏 -->
+                <div class="profile-sidebar">
+                    <!-- 用户信息卡片 -->
+                    <div class="user-card">
+                        <div class="avatar">👤</div>
+                        <h2 class="user-name">张三</h2>
+                        <div class="user-level">Level 3</div>
+                        <div class="user-stats">
+                            <div class="stat">
+                                <div class="stat-number">12</div>
+                                <div class="stat-label">已完成课程</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">45</div>
+                                <div class="stat-label">学习小时</div>
+                            </div>
+                        </div>
+                        <button class="edit-profile-btn">编辑个人资料</button>
+                    </div>
+
+                    <!-- 导航菜单 -->
+                    <div class="nav-menu">
+                        <div class="nav-menu-item active">个人信息</div>
+                        <div class="nav-menu-item">学习进度</div>
+                        <div class="nav-menu-item">翻译历史</div>
+                        <div class="nav-menu-item">账户设置</div>
+                        <div class="nav-menu-item">隐私设置</div>
+                        <div class="nav-menu-item">退出登录</div>
+                    </div>
+                </div>
+
+                <!-- 右侧内容 -->
+                <div class="profile-content">
+                    <!-- 个人信息 -->
+                    <div class="content-card">
+                        <h2>个人信息</h2>
+                        <form>
+                            <div class="form-group">
+                                <label for="name">姓名</label>
+                                <input type="text" id="name" value="张三">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">邮箱</label>
+                                <input type="email" id="email" value="zhangsan@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">手机号码</label>
+                                <input type="tel" id="phone" value="13800138000">
+                            </div>
+                            <div class="form-group">
+                                <label for="language">偏好语言</label>
+                                <select id="language">
+                                    <option value="zh">中文</option>
+                                    <option value="en">英文</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bio">个人简介</label>
+                                <textarea id="bio" rows="3">我是一名手语爱好者，希望通过SignBridge平台学习更多手语知识，与更多听障人士交流。</textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">保存更改</button>
+                                <button type="button" class="btn btn-secondary">取消</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 学习进度 -->
+                    <div class="content-card">
+                        <h2>学习进度</h2>
+                        <div class="progress-section" id="profileProgressSection">
+                            <!-- 进度条将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 最近活动 -->
+                    <div class="content-card">
+                        <h2>最近活动</h2>
+                        <ul class="activity-list">
+                            <li class="activity-item">
+                                <div class="activity-icon">📚</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">完成了课程：日常生活用语</div>
+                                    <div class="activity-time">2026-03-14 15:30</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon">🔄</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">使用了实时翻译功能</div>
+                                    <div class="activity-time">2026-03-13 10:15</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon">💬</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">在论坛发布了帖子</div>
+                                    <div class="activity-time">2026-03-12 18:45</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon">📖</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">开始学习：职场沟通技巧</div>
+                                    <div class="activity-time">2026-03-11 09:20</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SignBridge</h3>
+                    <p>智能手语交流平台</p>
+                    <p>让沟通无障碍</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="translate.html">实时翻译</a></li>
+                        <li><a href="learn.html">手语学习</a></li>
+                        <li><a href="forum.html">手语论坛</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>支持</h3>
+                    <ul>
+                        <li><a href="emergency.html">紧急求助</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('help')">帮助中心</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('contact')">联系我们</a></li>
+                        <li><a href="javascript:void(0);" onclick="generateSupportPage('privacy')">隐私政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SignBridge. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

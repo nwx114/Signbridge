@@ -1,0 +1,2377 @@
+// SignBridge 智能手语交流平台 - 公共脚本
+
+// 页面加载完成后执行
+document.addEventListener('DOMContentLoaded', function () {
+    // 平滑滚动
+    smoothScroll();
+
+    // 导航栏滚动效果
+    navbarScroll();
+
+    // 响应式菜单
+    responsiveMenu();
+
+    // 按钮悬停效果
+    buttonHoverEffects();
+
+    // 卡片悬停效果
+    cardHoverEffects();
+
+    // 表单验证
+    formValidation();
+
+    // 滚动动画
+    scrollAnimations();
+
+    // 功能卡片点击跳转
+    featureCardClick();
+
+    // 登录功能初始化
+    initLogin();
+
+    // 绑定导航菜单事件（页面加载时）
+    bindNavMenuEvents();
+
+    // 初始化页面跳转跟踪
+    initPageNavigationTracking();
+});
+
+// 平滑滚动功能
+function smoothScroll() {
+    const links = document.querySelectorAll('a[href^="#"]');
+    links.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
+// 导航栏滚动效果
+function navbarScroll() {
+    const header = document.querySelector('header');
+    if (!header) return;
+
+    window.addEventListener('scroll', function () {
+        if (window.scrollY > 50) {
+            header.style.backgroundColor = '#2c3e50';
+            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        } else {
+            header.style.backgroundColor = '#2c3e50';
+            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        }
+    });
+}
+
+// 响应式菜单
+function responsiveMenu() {
+    // 这里可以添加移动端菜单的逻辑
+    // 例如汉堡菜单的实现
+}
+
+// 按钮悬停效果
+function buttonHoverEffects() {
+    const buttons = document.querySelectorAll('.btn, .course-btn, .contact-btn, .edit-profile-btn');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function () {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+        });
+
+        button.addEventListener('mouseleave', function () {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+}
+
+// 卡片悬停效果
+function cardHoverEffects() {
+    const cards = document.querySelectorAll('.feature-card, .course-card, .emergency-type-card, .recommended-item, .post-item');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function () {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 8px 16px rgba(0,0,0,0.1)';
+        });
+
+        card.addEventListener('mouseleave', function () {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        });
+    });
+}
+
+// 表单验证
+function formValidation() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function (e) {
+            const inputs = form.querySelectorAll('input[required], textarea[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#e74c3c';
+                    input.style.backgroundColor = '#fef2f2';
+                } else {
+                    input.style.borderColor = '#ddd';
+                    input.style.backgroundColor = 'white';
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('请填写所有必填字段');
+            }
+        });
+
+        // 输入框焦点效果
+        const inputs = form.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function () {
+                this.style.borderColor = '#3498db';
+                this.style.boxShadow = '0 0 0 2px rgba(52, 152, 219, 0.2)';
+            });
+
+            input.addEventListener('blur', function () {
+                this.style.borderColor = '#ddd';
+                this.style.boxShadow = 'none';
+            });
+        });
+    });
+}
+
+// 滚动动画
+function scrollAnimations() {
+    const elements = document.querySelectorAll('.feature-card, .course-card, .emergency-type-card, .recommended-item');
+
+    function checkInView() {
+        elements.forEach(element => {
+            const rect = element.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            if (rect.top < windowHeight * 0.85) {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }
+        });
+    }
+
+    // 初始设置
+    elements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    });
+
+    // 检查是否在视口中
+    window.addEventListener('scroll', checkInView);
+    checkInView(); // 初始检查
+}
+
+// 加载更多功能
+function loadMoreContent() {
+    const loadMoreButtons = document.querySelectorAll('.load-more');
+    loadMoreButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
+
+            // 模拟加载延迟
+            setTimeout(() => {
+                this.innerHTML = '加载更多';
+                alert('已加载更多内容');
+            }, 1500);
+        });
+    });
+}
+
+// 模态框功能
+function initModals() {
+    const modalTriggers = document.querySelectorAll('[data-modal]');
+    modalTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function () {
+            const modalId = this.getAttribute('data-modal');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    });
+
+    const closeButtons = document.querySelectorAll('.modal-close');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const modal = this.closest('.modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    });
+
+    // 点击模态框外部关闭
+    window.addEventListener('click', function (e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+}
+
+// 功能卡片点击跳转
+function featureCardClick() {
+    const featureCards = document.querySelectorAll('.feature-card[data-href]');
+    featureCards.forEach(card => {
+        card.addEventListener('click', function () {
+            const href = this.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+    });
+}
+
+// 登录功能
+function initLogin() {
+    // 检查登录状态
+    checkLoginStatus();
+
+    // 登录按钮点击事件
+    const loginButtons = document.querySelectorAll('.login-btn');
+    loginButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            showLoginModal();
+        });
+    });
+
+    // 注册按钮点击事件
+    const registerButtons = document.querySelectorAll('.register-btn');
+    registerButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            showRegisterModal();
+        });
+    });
+
+    // 退出登录按钮点击事件 - 移除，因为在updateUIForLoggedIn中已经绑定
+    // 这样可以避免重复绑定事件监听器导致的多次弹出提示
+}
+
+// 检查登录状态
+function checkLoginStatus() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        // 已登录状态
+        updateUIForLoggedIn(user);
+    } else {
+        // 未登录状态
+        updateUIForLoggedOut();
+    }
+}
+
+// 显示登录模态框
+function showLoginModal() {
+    // 检查是否已经存在登录模态框
+    if (document.getElementById('loginModal')) {
+        return; // 如果已存在，直接返回
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'loginModal';
+    modal.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.zIndex = '1000';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.overflow = 'auto';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
+
+    modal.innerHTML = `
+        <div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>用户登录</h2>
+                <span class="modal-close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label for="loginUsername" style="display: block; margin-bottom: 5px; font-weight: bold;">用户名</label>
+                    <input type="text" id="loginUsername" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label for="loginPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">密码</label>
+                    <input type="password" id="loginPassword" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="text-align: right;">
+                    <a href="#" style="color: #3498db; text-decoration: none;">忘记密码?</a>
+                </div>
+                <button type="submit" class="btn btn-primary" style="padding: 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">登录</button>
+                <div style="text-align: center; margin-top: 10px;">
+                    还没有账号? <a href="#" class="register-link" style="color: #3498db; text-decoration: none;">立即注册</a>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    // 关闭按钮事件
+    const closeBtn = modal.querySelector('.modal-close');
+    closeBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTimeout(() => modal.remove(), 300);
+    });
+
+    // 点击外部关闭
+    window.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            setTimeout(() => modal.remove(), 300);
+        }
+    });
+
+    // 注册链接点击事件
+    const registerLink = modal.querySelector('.register-link');
+    registerLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.style.display = 'none';
+        setTimeout(() => modal.remove(), 300);
+        showRegisterModal();
+    });
+
+    // 登录表单提交事件
+    const loginForm = modal.querySelector('#loginForm');
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+
+        if (login(username, password)) {
+            // 立即关闭模态框
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // 立即移除模态框元素
+            modal.remove();
+        }
+    });
+}
+
+// 显示注册模态框
+function showRegisterModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'registerModal';
+    modal.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.zIndex = '1000';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.overflow = 'auto';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
+
+    modal.innerHTML = `
+        <div style="background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>用户注册</h2>
+                <span class="modal-close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            <form id="registerForm" style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label for="registerUsername" style="display: block; margin-bottom: 5px; font-weight: bold;">用户名</label>
+                    <input type="text" id="registerUsername" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label for="registerEmail" style="display: block; margin-bottom: 5px; font-weight: bold;">邮箱</label>
+                    <input type="email" id="registerEmail" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label for="registerPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">密码</label>
+                    <input type="password" id="registerPassword" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label for="confirmPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">确认密码</label>
+                    <input type="password" id="confirmPassword" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="padding: 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">注册</button>
+                <div style="text-align: center; margin-top: 10px;">
+                    已有账号? <a href="#" class="login-link" style="color: #3498db; text-decoration: none;">立即登录</a>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    // 关闭按钮事件
+    const closeBtn = modal.querySelector('.modal-close');
+    closeBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTimeout(() => modal.remove(), 300);
+    });
+
+    // 点击外部关闭
+    window.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            setTimeout(() => modal.remove(), 300);
+        }
+    });
+
+    // 登录链接点击事件
+    const loginLink = modal.querySelector('.login-link');
+    loginLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.style.display = 'none';
+        setTimeout(() => modal.remove(), 300);
+        showLoginModal();
+    });
+
+    // 注册表单提交事件
+    const registerForm = modal.querySelector('#registerForm');
+    registerForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('registerUsername').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            alert('两次输入的密码不一致');
+            return;
+        }
+
+        if (register(username, email, password)) {
+            // 立即关闭模态框
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // 立即移除模态框元素
+            modal.remove();
+        }
+    });
+}
+
+// 关闭所有模态框
+function closeAllModals() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.style.display = 'none';
+        modal.remove();
+    });
+    document.body.style.overflow = 'auto';
+}
+
+// 登录函数
+function login(username, password) {
+    // 从localStorage获取用户数据
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    // 查找用户
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+        // 登录成功
+        localStorage.setItem('user', JSON.stringify(user));
+        closeAllModals();
+        updateUIForLoggedIn(user);
+        alert('登录成功！');
+        return true;
+    } else {
+        // 登录失败
+        alert('用户名或密码错误');
+        return false;
+    }
+}
+
+// 注册函数
+function register(username, email, password) {
+    // 从localStorage获取用户数据
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    // 检查用户名是否已存在
+    if (users.some(u => u.username === username)) {
+        alert('用户名已存在');
+        return false;
+    }
+
+    // 检查邮箱是否已被注册
+    if (users.some(u => u.email === email)) {
+        alert('邮箱已被注册');
+        return false;
+    }
+
+    // 创建新用户
+    const newUser = {
+        id: Date.now().toString(),
+        username: username,
+        email: email,
+        password: password,
+        level: 1,
+        completedCourses: 0,
+        learningHours: 0,
+        bio: ''
+    };
+
+    // 保存用户数据
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // 自动登录
+    localStorage.setItem('user', JSON.stringify(newUser));
+    closeAllModals();
+    updateUIForLoggedIn(newUser);
+    alert('注册成功！');
+    return true;
+}
+
+// 退出登录
+function logout() {
+    if (confirm('确定要退出登录吗？')) {
+        localStorage.removeItem('user');
+        updateUIForLoggedOut();
+        alert('已退出登录');
+    }
+}
+
+// 检查用户是否登录
+function isLoggedIn() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    return user !== null && user !== undefined;
+}
+
+// 更新已登录状态的UI
+function updateUIForLoggedIn(user) {
+    // 更新导航栏
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks) {
+        // 查找登录/注册链接并替换为用户信息
+        const profileLink = navLinks.querySelector('a[href="profile.html"]');
+        if (profileLink) {
+            profileLink.textContent = user.username;
+            profileLink.title = '个人中心';
+            // 确保保留个人中心链接
+            profileLink.href = 'profile.html';
+        }
+
+        // 检查是否已存在退出登录按钮
+        if (!navLinks.querySelector('.logout-btn')) {
+            const logoutLi = document.createElement('li');
+            logoutLi.innerHTML = '<a href="#" class="logout-btn">退出登录</a>';
+            navLinks.appendChild(logoutLi);
+
+            // 为新添加的退出登录按钮绑定事件
+            const logoutBtn = logoutLi.querySelector('.logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        }
+    }
+
+    // 更新个人中心页面
+    const profileLayout = document.querySelector('.profile-layout');
+    if (profileLayout) {
+        // 检查是否需要重新创建个人中心布局
+        const userCard = document.querySelector('.user-card');
+        const profileContent = document.querySelector('.profile-content');
+
+        if (!userCard || !profileContent) {
+            // 重新创建个人中心布局
+            profileLayout.innerHTML = `
+                <!-- 左侧边栏 -->
+                <div class="profile-sidebar">
+                    <!-- 用户信息卡片 -->
+                    <div class="user-card">
+                        <div class="avatar">${user.avatar ? `<img src="${user.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : '👤'}</div>
+                        <h2 class="user-name">${user.username}</h2>
+                        <div class="user-level">Level ${user.level || 1}</div>
+                        <div class="user-stats">
+                            <div class="stat">
+                                <div class="stat-number">${user.completedCourses || 0}</div>
+                                <div class="stat-label">已完成课程</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">${user.learningHours || 0}</div>
+                                <div class="stat-label">学习小时</div>
+                            </div>
+                        </div>
+                        <button class="edit-profile-btn">编辑个人资料</button>
+                    </div>
+
+                    <!-- 导航菜单 -->
+                    <div class="nav-menu">
+                        <div class="nav-menu-item active">个人信息</div>
+                        <div class="nav-menu-item">学习进度</div>
+                        <div class="nav-menu-item">翻译历史</div>
+                        <div class="nav-menu-item">账户设置</div>
+                        <div class="nav-menu-item">隐私设置</div>
+                        <div class="nav-menu-item">退出登录</div>
+                    </div>
+                </div>
+
+                <!-- 右侧内容 -->
+                <div class="profile-content">
+                    <!-- 个人信息 -->
+                    <div class="content-card">
+                        <h2>个人信息</h2>
+                        <form id="personalInfoForm">
+                            <div class="form-group">
+                                <label for="name">姓名</label>
+                                <input type="text" id="name" value="${user.username}">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">邮箱</label>
+                                <input type="email" id="email" value="${user.email}">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">手机号码</label>
+                                <input type="tel" id="phone" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="language">偏好语言</label>
+                                <select id="language">
+                                    <option value="zh" selected>中文</option>
+                                    <option value="en">英文</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bio">个人简介</label>
+                                <textarea id="bio" rows="3">${user.bio || '我是一名手语爱好者，希望通过SignBridge平台学习更多手语知识，与更多听障人士交流。'}</textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">保存更改</button>
+                                <button type="button" class="btn btn-secondary">取消</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 学习进度 -->
+                    <div class="content-card">
+                        <h2>学习进度</h2>
+                        <div class="progress-section">
+                            <div class="progress-item">
+                                <div class="progress-info">
+                                    <span>手语基础入门</span>
+                                    <span>100%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-info">
+                                    <span>日常生活用语</span>
+                                    <span>75%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%;"></div>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-info">
+                                    <span>职场沟通技巧</span>
+                                    <span>45%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 45%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 最近活动 -->
+                    <div class="content-card">
+                        <h2>最近活动</h2>
+                        <ul class="activity-list">
+                            <li class="activity-item">
+                                <div class="activity-icon">📚</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">完成了课程：日常生活用语</div>
+                                    <div class="activity-time">2026-03-14 15:30</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon">🔄</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">使用了实时翻译功能</div>
+                                    <div class="activity-time">2026-03-13 10:15</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon">💬</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">在论坛发布了帖子</div>
+                                    <div class="activity-time">2026-03-12 18:45</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon">📖</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">开始学习：职场沟通技巧</div>
+                                    <div class="activity-time">2026-03-11 09:20</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            // 重新绑定导航菜单事件
+            const navMenuItems = document.querySelectorAll('.nav-menu-item');
+            const contentCards = document.querySelectorAll('.content-card');
+
+            navMenuItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    // 移除所有菜单项的active类
+                    navMenuItems.forEach(i => i.classList.remove('active'));
+                    // 添加当前菜单项的active类
+                    this.classList.add('active');
+
+                    // 根据导航项文本找到对应的内容卡片
+                    const navText = this.textContent.trim();
+                    let targetCard = null;
+
+                    if (navText === '个人信息') {
+                        targetCard = contentCards[0];
+                    } else if (navText === '学习进度') {
+                        targetCard = contentCards[1];
+                    } else if (navText === '翻译历史' || navText === '最近活动') {
+                        // 跳转到实时翻译页面的翻译历史卡片
+                        window.location.href = 'translate.html#history-section';
+                        return;
+                    } else if (navText === '账户设置') {
+                        // 显示头像更换浮窗
+                        showAvatarChangeModal();
+                        return;
+                    } else if (navText === '隐私设置') {
+                        // 显示隐私设置浮窗
+                        showPrivacySettingsModal();
+                        return;
+                    } else if (navText === '退出登录') {
+                        logout();
+                        return;
+                    } else {
+                        // 对于其他导航项，显示提示
+                        alert('该功能正在开发中');
+                        return;
+                    }
+
+                    // 滚动到对应的内容卡片
+                    if (targetCard) {
+                        targetCard.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                });
+            });
+
+            // 重新绑定编辑个人资料按钮事件
+            const editProfileBtn = document.querySelector('.edit-profile-btn');
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', function () {
+                    // 滚动到个人信息表单位置
+                    const profileForm = document.querySelector('.content-card form');
+                    if (profileForm) {
+                        profileForm.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                });
+            }
+
+            // 重新绑定表单提交事件
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    alert('个人信息已保存');
+                });
+            }
+
+            // 退出登录按钮事件已经在导航菜单事件中处理，无需重复绑定
+        } else {
+            // 更新现有元素
+            const userName = userCard.querySelector('.user-name');
+            const userLevel = userCard.querySelector('.user-level');
+            const userStats = userCard.querySelector('.user-stats');
+            const avatar = userCard.querySelector('.avatar');
+
+            if (userName) userName.textContent = user.username;
+            if (userLevel) userLevel.textContent = `Level ${user.level || 1}`;
+            if (avatar) {
+                if (user.avatar) {
+                    avatar.innerHTML = `<img src="${user.avatar}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                } else {
+                    avatar.innerHTML = '👤';
+                }
+            }
+            if (userStats) {
+                userStats.innerHTML = `
+                    <div class="stat">
+                        <div class="stat-number">${user.completedCourses || 0}</div>
+                        <div class="stat-label">已完成课程</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">${user.learningHours || 0}</div>
+                        <div class="stat-label">学习小时</div>
+                    </div>
+                `;
+            }
+
+            // 显示个人中心内容
+            profileContent.style.display = 'block';
+        }
+
+        // 隐藏登录提示
+        const loginPrompt = document.querySelector('.login-prompt');
+        if (loginPrompt) {
+            loginPrompt.style.display = 'none';
+        }
+
+        // 从数据库加载个人信息并填充表单
+        loadPersonalInfoToForm(user.id);
+
+        // 更新学习进度显示
+        updateProfileLearningProgress(user.id);
+
+        // 更新最近活动显示
+        updateRecentActivities(user.id);
+
+        // 重新绑定导航菜单事件（无论是否重新创建布局都执行）
+        bindNavMenuEvents();
+    }
+}
+
+// 从数据库加载个人信息并填充表单
+function loadPersonalInfoToForm(userId) {
+    // 从数据库获取个人信息
+    const personalInfo = getPersonalInfoFromDatabase(userId);
+
+    if (personalInfo) {
+        // 填充表单字段
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const languageSelect = document.getElementById('language');
+        const bioTextarea = document.getElementById('bio');
+
+        if (nameInput) nameInput.value = personalInfo.name || '';
+        if (emailInput) emailInput.value = personalInfo.email || '';
+        if (phoneInput) phoneInput.value = personalInfo.phone || '';
+        if (languageSelect) languageSelect.value = personalInfo.language || 'zh';
+        if (bioTextarea) bioTextarea.value = personalInfo.bio || '';
+    }
+}
+
+// 绑定导航菜单事件
+function bindNavMenuEvents() {
+    const navMenuItems = document.querySelectorAll('.nav-menu-item');
+    const contentCards = document.querySelectorAll('.content-card');
+
+    // 先移除旧的事件监听器（避免重复绑定）
+    navMenuItems.forEach(item => {
+        // 移除所有事件监听器的方法：克隆元素并替换
+        const newItem = item.cloneNode(true);
+        item.parentNode.replaceChild(newItem, item);
+    });
+
+    // 重新获取元素并绑定新的事件监听器
+    const updatedNavMenuItems = document.querySelectorAll('.nav-menu-item');
+    updatedNavMenuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            // 移除所有菜单项的active类
+            updatedNavMenuItems.forEach(i => i.classList.remove('active'));
+            // 添加当前菜单项的active类
+            this.classList.add('active');
+
+            // 根据导航项文本找到对应的内容卡片
+            const navText = this.textContent.trim();
+            let targetCard = null;
+
+            if (navText === '个人信息') {
+                targetCard = contentCards[0];
+            } else if (navText === '学习进度') {
+                targetCard = contentCards[1];
+            } else if (navText === '翻译历史' || navText === '最近活动') {
+                // 跳转到实时翻译页面的翻译历史卡片
+                window.location.href = 'translate.html#history-section';
+                return;
+            } else if (navText === '账户设置') {
+                // 显示头像更换浮窗
+                showAvatarChangeModal();
+                return;
+            } else if (navText === '隐私设置') {
+                // 显示隐私设置浮窗
+                showPrivacySettingsModal();
+                return;
+            } else if (navText === '退出登录') {
+                logout();
+                return;
+            } else {
+                // 对于其他导航项，显示提示
+                alert('该功能正在开发中');
+                return;
+            }
+
+            // 滚动到对应的内容卡片
+            if (targetCard) {
+                targetCard.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    });
+
+    // 重新绑定编辑个人资料按钮事件
+    const editProfileBtn = document.querySelector('.edit-profile-btn');
+    if (editProfileBtn) {
+        // 移除旧的事件监听器
+        const newEditBtn = editProfileBtn.cloneNode(true);
+        editProfileBtn.parentNode.replaceChild(newEditBtn, editProfileBtn);
+
+        // 绑定新的事件监听器
+        newEditBtn.addEventListener('click', function () {
+            // 滚动到个人信息表单位置
+            const profileForm = document.querySelector('.content-card form');
+            if (profileForm) {
+                profileForm.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    }
+
+    // 重新绑定表单提交事件
+    const form = document.querySelector('form');
+    if (form) {
+        // 移除旧的事件监听器
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+
+        // 绑定新的事件监听器
+        newForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // 获取表单数据
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const language = document.getElementById('language').value;
+            const bio = document.getElementById('bio').value;
+
+            // 创建个人信息对象
+            const personalInfo = {
+                name: name,
+                email: email,
+                phone: phone,
+                language: language,
+                bio: bio,
+                timestamp: new Date().toISOString()
+            };
+
+            // 获取当前用户信息
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user ? user.id : null;
+
+            // 保存个人信息到数据库
+            savePersonalInfoToDatabase(userId, personalInfo);
+
+            // 同时更新用户数据库中的信息
+            if (user) {
+                user.username = name;
+                user.email = email;
+                user.bio = bio;
+                localStorage.setItem('user', JSON.stringify(user));
+
+                // 更新users数据库
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const userIndex = users.findIndex(u => u.id === user.id);
+                if (userIndex > -1) {
+                    users[userIndex].username = name;
+                    users[userIndex].email = email;
+                    users[userIndex].bio = bio;
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+
+                // 更新导航栏显示
+                updateUIForLoggedIn(user);
+            }
+
+            alert('个人信息已保存');
+        });
+    }
+}
+
+// 更新未登录状态的UI
+function updateUIForLoggedOut() {
+    // 更新导航栏
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks) {
+        // 查找个人中心链接并恢复为默认文本
+        const profileLink = navLinks.querySelector('a[href="profile.html"]');
+        if (profileLink) {
+            profileLink.textContent = '个人中心';
+            profileLink.title = '个人中心';
+        }
+
+        // 移除退出登录按钮
+        const logoutBtn = navLinks.querySelector('.logout-btn');
+        if (logoutBtn) {
+            logoutBtn.parentElement.remove();
+        }
+    }
+
+    // 更新个人中心页面
+    const profileLayout = document.querySelector('.profile-layout');
+    if (profileLayout) {
+        // 检查是否已存在登录提示
+        if (!document.querySelector('.login-prompt')) {
+            const loginPrompt = document.createElement('div');
+            loginPrompt.className = 'login-prompt';
+            loginPrompt.style.textAlign = 'center';
+            loginPrompt.style.padding = '60px 20px';
+            loginPrompt.style.backgroundColor = 'white';
+            loginPrompt.style.borderRadius = '10px';
+            loginPrompt.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            loginPrompt.style.margin = '0 auto';
+            loginPrompt.style.maxWidth = '500px';
+
+            loginPrompt.innerHTML = `
+                <h2 style="font-size: 2rem; color: #2c3e50; margin-bottom: 1rem;">请先登录</h2>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">登录后才能访问个人中心的功能</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-primary login-btn" style="padding: 0.8rem 1.5rem; background-color: #3498db; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">登录</button>
+                    <button class="btn btn-secondary register-btn" style="padding: 0.8rem 1.5rem; background-color: #95a5a6; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">注册</button>
+                </div>
+            `;
+
+            // 清空现有内容并添加登录提示
+            profileLayout.innerHTML = '';
+            profileLayout.appendChild(loginPrompt);
+        }
+    }
+
+    // 重新绑定登录按钮事件
+    const loginButtons = document.querySelectorAll('.login-btn');
+    loginButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            showLoginModal();
+        });
+    });
+
+    const registerButtons = document.querySelectorAll('.register-btn');
+    registerButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            showRegisterModal();
+        });
+    });
+}
+
+// 显示头像更换浮窗
+function showAvatarChangeModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'avatarChangeModal';
+    modal.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.zIndex = '1000';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+
+    modal.innerHTML = `
+        <div class="modal-content" style="background-color: white; padding: 2rem; border-radius: 10px; max-width: 500px; width: 90%; position: relative;">
+            <button class="modal-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">更换头像</h2>
+            
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div id="avatarPreview" style="width: 120px; height: 120px; border-radius: 50%; background-color: #3498db; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 3rem; color: white; overflow: hidden;">
+                    👤
+                </div>
+                <p style="color: #666; margin-bottom: 1rem;">点击下方按钮上传新头像</p>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label for="avatarInput" style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #2c3e50;">选择图片</label>
+                <input type="file" id="avatarInput" accept="image/*" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button id="saveAvatarBtn" class="btn btn-primary" style="padding: 0.8rem 1.5rem; background-color: #3498db; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">保存头像</button>
+                <button id="cancelAvatarBtn" class="btn btn-secondary" style="padding: 0.8rem 1.5rem; background-color: #95a5a6; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">取消</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    // 关闭按钮事件
+    const closeBtn = modal.querySelector('.modal-close');
+    closeBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTimeout(() => modal.remove(), 300);
+    });
+
+    // 点击外部关闭
+    window.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            setTimeout(() => modal.remove(), 300);
+        }
+    });
+
+    // 取消按钮事件
+    const cancelBtn = modal.querySelector('#cancelAvatarBtn');
+    cancelBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTimeout(() => modal.remove(), 300);
+    });
+
+    // 头像预览
+    const avatarInput = modal.querySelector('#avatarInput');
+    const avatarPreview = modal.querySelector('#avatarPreview');
+
+    avatarInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                avatarPreview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 保存头像按钮事件
+    const saveAvatarBtn = modal.querySelector('#saveAvatarBtn');
+    saveAvatarBtn.addEventListener('click', function () {
+        const file = avatarInput.files[0];
+        if (!file) {
+            alert('请选择要上传的头像图片');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const avatarData = e.target.result;
+
+            // 获取当前用户信息
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                alert('请先登录');
+                return;
+            }
+
+            // 保存头像到数据库
+            saveAvatarToDatabase(user.id, avatarData);
+
+            // 更新用户信息中的头像
+            user.avatar = avatarData;
+            localStorage.setItem('user', JSON.stringify(user));
+
+            // 更新用户数据库中的头像
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userIndex = users.findIndex(u => u.id === user.id);
+            if (userIndex > -1) {
+                users[userIndex].avatar = avatarData;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            // 更新页面上的头像显示
+            const avatarElement = document.querySelector('.avatar');
+            if (avatarElement) {
+                avatarElement.innerHTML = `<img src="${avatarData}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            }
+
+            // 关闭浮窗
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            setTimeout(() => modal.remove(), 300);
+
+            alert('头像更换成功！');
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// 保存头像到数据库
+function saveAvatarToDatabase(userId, avatarData) {
+    // 从localStorage获取头像数据库
+    const avatars = JSON.parse(localStorage.getItem('avatars')) || {};
+
+    // 保存或更新用户头像
+    avatars[userId] = avatarData;
+
+    // 保存到localStorage
+    localStorage.setItem('avatars', JSON.stringify(avatars));
+}
+
+// 从数据库获取用户头像
+function getAvatarFromDatabase(userId) {
+    const avatars = JSON.parse(localStorage.getItem('avatars')) || {};
+    return avatars[userId] || null;
+}
+
+// 显示隐私设置浮窗
+function showPrivacySettingsModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'privacySettingsModal';
+    modal.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.zIndex = '1000';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+
+    // 获取当前用户信息
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 从数据库获取用户隐私信息
+    const userPrivacyInfo = getPrivacyInfoFromDatabase(userId);
+
+    modal.innerHTML = `
+        <div class="modal-content" style="background-color: white; padding: 2rem; border-radius: 10px; max-width: 500px; width: 90%; position: relative;">
+            <button class="modal-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">隐私设置</h2>
+            
+            <form id="privacyForm">
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="privacyName" style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #2c3e50;">姓名</label>
+                    <input type="text" id="privacyName" value="${userPrivacyInfo ? userPrivacyInfo.name : ''}" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="privacyPhone" style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #2c3e50;">手机号码</label>
+                    <input type="tel" id="privacyPhone" value="${userPrivacyInfo ? userPrivacyInfo.phone : ''}" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="privacyIdCard" style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #2c3e50;">身份证号</label>
+                    <input type="text" id="privacyIdCard" value="${userPrivacyInfo ? userPrivacyInfo.idCard : ''}" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="privacyLocation" style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #2c3e50;">位置</label>
+                    <input type="text" id="privacyLocation" value="${userPrivacyInfo ? userPrivacyInfo.location : ''}" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    <button type="button" id="getLocationBtn" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background-color: #3498db; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">获取当前位置</button>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.8rem 1.5rem; background-color: #3498db; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">保存信息</button>
+                    <button type="button" id="cancelPrivacyBtn" class="btn btn-secondary" style="padding: 0.8rem 1.5rem; background-color: #95a5a6; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">取消</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    // 关闭按钮事件
+    const closeBtn = modal.querySelector('.modal-close');
+    closeBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTimeout(() => modal.remove(), 300);
+    });
+
+    // 点击外部关闭
+    window.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            setTimeout(() => modal.remove(), 300);
+        }
+    });
+
+    // 取消按钮事件
+    const cancelBtn = modal.querySelector('#cancelPrivacyBtn');
+    cancelBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTimeout(() => modal.remove(), 300);
+    });
+
+    // 获取当前位置按钮事件
+    const getLocationBtn = modal.querySelector('#getLocationBtn');
+    getLocationBtn.addEventListener('click', function () {
+        if (navigator.geolocation) {
+            getLocationBtn.innerHTML = '获取中...';
+            getLocationBtn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // 这里可以使用逆地理编码API获取具体地址
+                    // 为了简化，我们直接显示经纬度
+                    document.getElementById('privacyLocation').value = `纬度: ${lat.toFixed(6)}, 经度: ${lng.toFixed(6)}`;
+
+                    getLocationBtn.innerHTML = '获取当前位置';
+                    getLocationBtn.disabled = false;
+                },
+                function (error) {
+                    console.error('获取位置失败:', error);
+                    alert('获取位置失败，请手动输入位置信息');
+                    getLocationBtn.innerHTML = '获取当前位置';
+                    getLocationBtn.disabled = false;
+                }
+            );
+        } else {
+            alert('您的浏览器不支持地理定位功能');
+        }
+    });
+
+    // 表单提交事件
+    const privacyForm = modal.querySelector('#privacyForm');
+    privacyForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('privacyName').value;
+        const phone = document.getElementById('privacyPhone').value;
+        const idCard = document.getElementById('privacyIdCard').value;
+        const location = document.getElementById('privacyLocation').value;
+
+        if (!name || !phone || !idCard || !location) {
+            alert('请填写完整的个人信息');
+            return;
+        }
+
+        // 保存隐私信息到数据库
+        const privacyInfo = {
+            name: name,
+            phone: phone,
+            idCard: idCard,
+            location: location
+        };
+
+        savePrivacyInfoToDatabase(userId, privacyInfo);
+
+        // 关闭浮窗
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTimeout(() => modal.remove(), 300);
+
+        alert('隐私信息保存成功！');
+    });
+}
+
+// 保存隐私信息到数据库
+function savePrivacyInfoToDatabase(userId, privacyInfo) {
+    // 从localStorage获取隐私信息数据库
+    const privacyData = JSON.parse(localStorage.getItem('privacyData')) || {};
+
+    // 保存或更新用户隐私信息
+    if (userId) {
+        privacyData[userId] = privacyInfo;
+    } else {
+        // 如果没有用户ID，使用临时存储
+        privacyData['temp'] = privacyInfo;
+    }
+
+    // 保存到localStorage
+    localStorage.setItem('privacyData', JSON.stringify(privacyData));
+}
+
+// 从数据库获取用户隐私信息
+function getPrivacyInfoFromDatabase(userId) {
+    const privacyData = JSON.parse(localStorage.getItem('privacyData')) || {};
+    if (userId) {
+        return privacyData[userId] || null;
+    } else {
+        return privacyData['temp'] || null;
+    }
+}
+
+// 保存个人信息到数据库
+function savePersonalInfoToDatabase(userId, personalInfo) {
+    // 从localStorage获取个人信息数据库
+    const personalData = JSON.parse(localStorage.getItem('personalData')) || {};
+
+    // 保存或更新用户个人信息
+    if (userId) {
+        personalData[userId] = personalInfo;
+    } else {
+        // 如果没有用户ID，使用临时存储
+        personalData['temp'] = personalInfo;
+    }
+
+    // 保存到localStorage
+    localStorage.setItem('personalData', JSON.stringify(personalData));
+}
+
+// 从数据库获取用户个人信息
+function getPersonalInfoFromDatabase(userId) {
+    const personalData = JSON.parse(localStorage.getItem('personalData')) || {};
+    if (userId) {
+        return personalData[userId] || null;
+    } else {
+        return personalData['temp'] || null;
+    }
+}
+
+// 保存学习进度到数据库
+function saveLearningProgressToDatabase(userId, progress) {
+    // 从localStorage获取学习进度数据库
+    const learningProgressData = JSON.parse(localStorage.getItem('learningProgress')) || {};
+
+    // 保存或更新用户学习进度
+    if (userId) {
+        learningProgressData[userId] = progress;
+    } else {
+        // 如果没有用户ID，使用临时存储
+        learningProgressData['temp'] = progress;
+    }
+
+    // 保存到localStorage
+    localStorage.setItem('learningProgress', JSON.stringify(learningProgressData));
+}
+
+// 从数据库获取学习进度
+function getLearningProgressFromDatabase(userId) {
+    // 从localStorage获取学习进度数据库
+    const learningProgressData = JSON.parse(localStorage.getItem('learningProgress')) || {};
+
+    // 返回指定用户的学习进度
+    if (userId) {
+        return learningProgressData[userId] || resetLearningProgress();
+    } else {
+        // 如果没有用户ID，返回临时存储的进度
+        return learningProgressData['temp'] || resetLearningProgress();
+    }
+}
+
+// 重置学习进度为零
+function resetLearningProgress() {
+    return {
+        totalProgress: 0,
+        level: 1,
+        completedCourses: 0,
+        learningHours: 0,
+        courses: {
+            '手语基础入门': 0,
+            '日常生活用语': 0,
+            '职场沟通技巧': 0,
+            '紧急情况表达': 0,
+            '高级表达技巧': 0,
+            '手语文化与历史': 0
+        }
+    };
+}
+
+// 初始化学习进度
+function initLearningProgress() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 获取当前进度，如果不存在则重置为零
+    const progress = getLearningProgressFromDatabase(userId);
+
+    // 保存重置后的进度
+    saveLearningProgressToDatabase(userId, progress);
+
+    return progress;
+}
+
+// 更新学习进度
+function updateLearningProgress(courseName, progress) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 获取当前进度
+    const currentProgress = getLearningProgressFromDatabase(userId);
+
+    // 更新课程进度
+    if (currentProgress.courses[courseName] !== undefined) {
+        currentProgress.courses[courseName] = progress;
+    }
+
+    // 计算总进度
+    const courseCount = Object.keys(currentProgress.courses).length;
+    const totalProgress = Object.values(currentProgress.courses).reduce((sum, val) => sum + val, 0) / courseCount;
+    currentProgress.totalProgress = Math.round(totalProgress);
+
+    // 更新已完成课程数
+    currentProgress.completedCourses = Object.values(currentProgress.courses).filter(val => val === 100).length;
+
+    // 保存更新后的进度
+    saveLearningProgressToDatabase(userId, currentProgress);
+
+    return currentProgress;
+}
+
+// 重置学习进度
+function resetLearningProgress() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 创建初始进度对象
+    const initialProgress = {
+        totalProgress: 0,
+        completedCourses: 0,
+        learningHours: 0,
+        level: 1,
+        courses: {
+            '手语基础入门': 0,
+            '日常生活用语': 0,
+            '职场沟通技巧': 0,
+            '紧急情况表达': 0,
+            '高级表达技巧': 0,
+            '手语文化与历史': 0
+        },
+        lastUpdated: new Date().toISOString()
+    };
+
+    // 保存重置后的进度
+    saveLearningProgressToDatabase(userId, initialProgress);
+
+    return initialProgress;
+}
+
+// 生成支持页面
+function generateSupportPage(pageType) {
+    // 页面内容映射
+    const pageContent = {
+        'help': {
+            title: '帮助中心',
+            content: `
+                <h2>常见问题</h2>
+                <div class="faq-item">
+                    <h3>如何开始学习手语？</h3>
+                    <p>您可以通过点击导航栏中的"手语学习"进入学习页面，选择适合您水平的课程开始学习。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>如何使用实时翻译功能？</h3>
+                    <p>在"实时翻译"页面，您可以选择摄像头模式或上传图片模式，系统会自动识别手语并翻译成文字。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>如何注册账号？</h3>
+                    <p>点击导航栏中的"个人中心"，然后点击"注册"按钮，填写相关信息即可完成注册。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>如何重置学习进度？</h3>
+                    <p>在"手语学习"页面的进度跟踪部分，点击"重置学习进度"按钮即可。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>如何联系客服？</h3>
+                    <p>您可以通过"联系我们"页面的联系方式与我们取得联系，或发送邮件至support@signbridge.com。</p>
+                </div>
+            `
+        },
+        'contact': {
+            title: '联系我们',
+            content: `
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <h3>邮箱</h3>
+                        <p>support@signbridge.com</p>
+                    </div>
+                    <div class="contact-item">
+                        <h3>电话</h3>
+                        <p>400-123-4567</p>
+                    </div>
+                    <div class="contact-item">
+                        <h3>地址</h3>
+                        <p>北京市海淀区中关村科技园区</p>
+                    </div>
+                    <div class="contact-item">
+                        <h3>工作时间</h3>
+                        <p>周一至周五 9:00-18:00</p>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <h3>发送消息</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">姓名</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">消息</label>
+                            <textarea id="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">发送</button>
+                    </form>
+                </div>
+            `
+        },
+        'privacy': {
+            title: '隐私政策',
+            content: `
+                <h2>隐私政策</h2>
+                <p>SignBridge 致力于保护您的隐私和个人信息。本隐私政策解释了我们如何收集、使用和保护您的信息。</p>
+                <h3>1. 收集的信息</h3>
+                <p>我们可能收集以下信息：</p>
+                <ul>
+                    <li>个人身份信息（如姓名、邮箱、电话号码）</li>
+                    <li>学习进度和使用数据</li>
+                    <li>设备信息（如IP地址、浏览器类型）</li>
+                </ul>
+                <h3>2. 信息使用</h3>
+                <p>我们使用收集的信息：</p>
+                <ul>
+                    <li>提供和改进我们的服务</li>
+                    <li>个性化您的学习体验</li>
+                    <li>发送重要通知和更新</li>
+                    <li>分析使用趋势以改进服务</li>
+                </ul>
+                <h3>3. 信息保护</h3>
+                <p>我们采取以下措施保护您的信息：</p>
+                <ul>
+                    <li>加密存储敏感数据</li>
+                    <li>限制访问您的信息</li>
+                    <li>定期安全审计</li>
+                </ul>
+                <h3>4. 信息共享</h3>
+                <p>我们不会向第三方共享您的个人信息，除非：</p>
+                <ul>
+                    <li>获得您的明确许可</li>
+                    <li>法律要求或保护我们的权利</li>
+                    <li>提供必要的服务（如支付处理）</li>
+                </ul>
+                <h3>5. 您的权利</h3>
+                <p>您有权：</p>
+                <ul>
+                    <li>访问和修改您的个人信息</li>
+                    <li>请求删除您的个人信息</li>
+                    <li>选择退出营销通信</li>
+                </ul>
+                <h3>6. 政策更新</h3>
+                <p>我们可能会不时更新本隐私政策，更新后的政策将在网站上公布。</p>
+            `
+        }
+    };
+
+    // 创建模态框
+    const modal = document.createElement('div');
+    modal.id = 'supportModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+
+    // 创建模态框内容
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background-color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+    `;
+
+    // 创建关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #666;
+    `;
+
+    // 创建页面内容
+    const pageData = pageContent[pageType];
+    const content = `
+        <h1 style="margin-bottom: 1.5rem; color: #2c3e50;">${pageData.title}</h1>
+        <div style="line-height: 1.6;">
+            ${pageData.content}
+        </div>
+    `;
+
+    // 组装模态框
+    modalContent.innerHTML = content;
+    modalContent.appendChild(closeBtn);
+    modal.appendChild(modalContent);
+
+    // 添加到页面
+    document.body.appendChild(modal);
+
+    // 添加关闭事件
+    closeBtn.addEventListener('click', function () {
+        document.body.removeChild(modal);
+    });
+
+    // 点击模态框外部关闭
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+
+    // 如果是联系我们页面，添加表单提交事件
+    if (pageType === 'contact') {
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                alert('消息已发送，我们会尽快回复您！');
+                document.body.removeChild(modal);
+            });
+        }
+    }
+}
+
+// 更新学习小时数
+function updateLearningHours(hours) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    // 获取当前进度
+    const currentProgress = getLearningProgressFromDatabase(userId);
+
+    // 更新学习小时数
+    currentProgress.learningHours += hours;
+
+    // 保存更新后的进度
+    saveLearningProgressToDatabase(userId, currentProgress);
+
+    return currentProgress;
+}
+
+// 更新个人中心学习进度显示
+function updateProfileLearningProgress(userId) {
+    // 获取学习进度
+    const progress = getLearningProgressFromDatabase(userId);
+
+    // 找到个人中心的进度显示区域
+    const progressSection = document.getElementById('profileProgressSection');
+    if (!progressSection) return;
+
+    // 清空现有内容
+    progressSection.innerHTML = '';
+
+    // 为每个课程创建进度条
+    Object.entries(progress.courses).forEach(([courseName, courseProgress]) => {
+        const progressItem = document.createElement('div');
+        progressItem.className = 'progress-item';
+        progressItem.innerHTML = `
+            <div class="progress-info">
+                <span>${courseName}</span>
+                <span>${courseProgress}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${courseProgress}%;"></div>
+            </div>
+        `;
+        progressSection.appendChild(progressItem);
+    });
+}
+
+// 保存活动记录到数据库
+function saveActivityRecord(userId, activity) {
+    // 从localStorage获取活动记录数据库
+    const activityData = JSON.parse(localStorage.getItem('activityData')) || {};
+
+    // 获取用户的活动记录
+    let userActivities = activityData[userId] || [];
+
+    // 添加新活动到记录开头
+    userActivities.unshift(activity);
+
+    // 限制记录数量不超过3条
+    if (userActivities.length > 3) {
+        userActivities = userActivities.slice(0, 3);
+    }
+
+    // 保存更新后的活动记录
+    activityData[userId] = userActivities;
+    localStorage.setItem('activityData', JSON.stringify(activityData));
+}
+
+// 从数据库获取活动记录
+function getActivityRecords(userId) {
+    // 从localStorage获取活动记录数据库
+    const activityData = JSON.parse(localStorage.getItem('activityData')) || {};
+
+    // 返回用户的活动记录
+    return activityData[userId] || [];
+}
+
+// 记录页面跳转活动
+function recordPageNavigation(fromPage, toPage) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : null;
+
+    if (!userId) return;
+
+    // 页面名称映射
+    const pageNames = {
+        'index.html': '首页',
+        'translate.html': '实时翻译',
+        'learn.html': '手语学习',
+        'forum.html': '手语论坛',
+        'emergency.html': '紧急求助',
+        'profile.html': '个人中心'
+    };
+
+    // 获取友好的页面名称
+    const fromPageName = pageNames[fromPage] || fromPage;
+    const toPageName = pageNames[toPage] || toPage;
+
+    // 创建活动记录
+    const activity = {
+        type: '页面跳转',
+        title: `从 ${fromPageName} 跳转到 ${toPageName}`,
+        time: new Date().toISOString().replace('T', ' ').slice(0, 19)
+    };
+
+    // 保存活动记录
+    saveActivityRecord(userId, activity);
+}
+
+// 更新个人中心最近活动显示
+function updateRecentActivities(userId) {
+    // 获取活动记录
+    const activities = getActivityRecords(userId);
+
+    // 找到最近活动显示区域
+    const activityList = document.querySelector('.activity-list');
+    if (!activityList) return;
+
+    // 清空现有内容
+    activityList.innerHTML = '';
+
+    // 如果没有活动记录，显示提示信息
+    if (activities.length === 0) {
+        const noActivityItem = document.createElement('li');
+        noActivityItem.className = 'activity-item';
+        noActivityItem.innerHTML = `
+            <div class="activity-icon">📋</div>
+            <div class="activity-content">
+                <div class="activity-title">暂无活动记录</div>
+                <div class="activity-time">-</div>
+            </div>
+        `;
+        activityList.appendChild(noActivityItem);
+        return;
+    }
+
+    // 为每条活动记录创建列表项
+    activities.forEach(activity => {
+        const activityItem = document.createElement('li');
+        activityItem.className = 'activity-item';
+
+        // 根据活动类型选择图标
+        let icon = '📋';
+        if (activity.type === '页面跳转') icon = '🔗';
+        else if (activity.type === '课程学习') icon = '📚';
+        else if (activity.type === '翻译') icon = '🔄';
+        else if (activity.type === '论坛') icon = '💬';
+
+        activityItem.innerHTML = `
+            <div class="activity-icon">${icon}</div>
+            <div class="activity-content">
+                <div class="activity-title">${activity.title}</div>
+                <div class="activity-time">${activity.time}</div>
+            </div>
+        `;
+        activityList.appendChild(activityItem);
+    });
+}
+
+// 监听页面跳转
+function initPageNavigationTracking() {
+    // 监听所有链接点击
+    document.addEventListener('click', function (e) {
+        const target = e.target.closest('a');
+        if (target && target.href) {
+            // 获取当前页面和目标页面
+            const fromPage = window.location.pathname.split('/').pop() || 'index.html';
+            const toPage = new URL(target.href).pathname.split('/').pop() || 'index.html';
+
+            // 记录页面跳转
+            recordPageNavigation(fromPage, toPage);
+        }
+    });
+}
+
+// ==================== 翻译历史数据库操作 ====================
+
+// 获取翻译历史数据库
+function getTranslationHistoryDatabase() {
+    return JSON.parse(localStorage.getItem('translationHistoryData')) || {};
+}
+
+// 保存翻译历史到数据库
+function saveTranslationHistoryToDatabase(userId, history) {
+    const historyData = getTranslationHistoryDatabase();
+    historyData[userId] = history;
+    localStorage.setItem('translationHistoryData', JSON.stringify(historyData));
+}
+
+// 获取用户的翻译历史
+function getTranslationHistory(userId) {
+    const historyData = getTranslationHistoryDatabase();
+    return historyData[userId] || [];
+}
+
+// 添加翻译历史记录
+function addTranslationHistory(userId, text) {
+    if (!text || text === '正在识别手语...' || text === '翻译结果将显示在这里...' || text === '翻译已停止') {
+        return;
+    }
+
+    // 获取当前时间
+    const now = new Date();
+    const timeString = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
+
+    // 创建历史记录项
+    const historyItem = {
+        id: Date.now(), // 唯一ID
+        text: text,
+        time: timeString,
+        timestamp: now.getTime()
+    };
+
+    // 获取用户的翻译历史
+    let userHistory = getTranslationHistory(userId);
+
+    // 检查是否重复记录（最近5秒内）
+    const lastItem = userHistory[0];
+    if (lastItem && lastItem.text === text && (now.getTime() - lastItem.timestamp) < 5000) {
+        return;
+    }
+
+    // 添加到历史记录开头
+    userHistory.unshift(historyItem);
+
+    // 限制历史记录数量，最多保留50条
+    if (userHistory.length > 50) {
+        userHistory = userHistory.slice(0, 50);
+    }
+
+    // 保存到数据库
+    saveTranslationHistoryToDatabase(userId, userHistory);
+
+    return historyItem;
+}
+
+// 删除单条翻译历史
+function deleteTranslationHistory(userId, historyId) {
+    let userHistory = getTranslationHistory(userId);
+    userHistory = userHistory.filter(item => item.id !== historyId);
+    saveTranslationHistoryToDatabase(userId, userHistory);
+    return userHistory;
+}
+
+// 清空用户的翻译历史
+function clearTranslationHistory(userId) {
+    saveTranslationHistoryToDatabase(userId, []);
+}
+
+// 渲染翻译历史列表
+function renderTranslationHistory(userId, container) {
+    if (!container) return;
+
+    const history = getTranslationHistory(userId);
+
+    // 清空容器
+    container.innerHTML = '';
+
+    if (history.length === 0) {
+        container.innerHTML = '<div class="history-empty" style="text-align: center; padding: 2rem; color: #999;">暂无翻译历史</div>';
+        return;
+    }
+
+    // 渲染每条历史记录
+    history.forEach(item => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.setAttribute('data-id', item.id);
+        historyItem.innerHTML = `
+            <div class="time">${item.time}</div>
+            <div class="text">${item.text}</div>
+            <button class="delete-history-btn" onclick="deleteHistoryItem(${item.id})" style="
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #e74c3c;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                padding: 2px 8px;
+                cursor: pointer;
+                font-size: 12px;
+            ">删除</button>
+        `;
+        historyItem.style.position = 'relative';
+        container.appendChild(historyItem);
+    });
+}
+
+// 删除单条历史记录（全局函数供HTML调用）
+function deleteHistoryItem(historyId) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.id : 'guest';
+
+    if (confirm('确定要删除这条翻译记录吗？')) {
+        const updatedHistory = deleteTranslationHistory(userId, historyId);
+        const container = document.querySelector('.history-list');
+        if (container) {
+            renderTranslationHistory(userId, container);
+        }
+    }
+}
+
+// 初始化翻译历史数据库（清零现有数据）
+function initTranslationHistoryDatabase() {
+    // 检查是否已经初始化
+    if (!localStorage.getItem('translationHistoryInitialized')) {
+        // 清零现有翻译历史数据
+        localStorage.setItem('translationHistoryData', JSON.stringify({}));
+        localStorage.setItem('translationHistoryInitialized', 'true');
+        console.log('翻译历史数据库已初始化');
+    }
+}
+
+// ==================== 帖子点赞数据库操作 ====================
+
+// 获取帖子点赞数据库
+function getPostLikesDatabase() {
+    return JSON.parse(localStorage.getItem('postLikesData')) || {};
+}
+
+// 保存帖子点赞数据库
+function savePostLikesDatabase(data) {
+    localStorage.setItem('postLikesData', JSON.stringify(data));
+}
+
+// 获取帖子点赞数
+function getPostLikes(postId) {
+    const likesData = getPostLikesDatabase();
+    return likesData[postId] ? likesData[postId].count : 0;
+}
+
+// 检查用户是否已点赞帖子
+function hasUserLikedPost(postId, userId) {
+    const likesData = getPostLikesDatabase();
+    return likesData[postId] && likesData[postId].users && likesData[postId].users.includes(userId);
+}
+
+// 切换帖子点赞状态
+function togglePostLike(postId, userId) {
+    const likesData = getPostLikesDatabase();
+
+    if (!likesData[postId]) {
+        likesData[postId] = { count: 0, users: [] };
+    }
+
+    const userIndex = likesData[postId].users.indexOf(userId);
+
+    if (userIndex > -1) {
+        // 取消点赞
+        likesData[postId].users.splice(userIndex, 1);
+        likesData[postId].count--;
+    } else {
+        // 添加点赞
+        likesData[postId].users.push(userId);
+        likesData[postId].count++;
+    }
+
+    savePostLikesDatabase(likesData);
+    return {
+        count: likesData[postId].count,
+        liked: userIndex === -1 // 返回当前状态：true表示已点赞
+    };
+}
+
+// ==================== 回复数据库操作 ====================
+
+// 获取回复数据库
+function getRepliesDatabase() {
+    return JSON.parse(localStorage.getItem('repliesData')) || {};
+}
+
+// 保存回复数据库
+function saveRepliesDatabase(data) {
+    localStorage.setItem('repliesData', JSON.stringify(data));
+}
+
+// 获取帖子的回复列表
+function getPostReplies(postId) {
+    const repliesData = getRepliesDatabase();
+    return repliesData[postId] || [];
+}
+
+// 添加回复
+function addReply(postId, author, content) {
+    const repliesData = getRepliesDatabase();
+
+    if (!repliesData[postId]) {
+        repliesData[postId] = [];
+    }
+
+    const newReply = {
+        id: Date.now(),
+        author: author,
+        content: content,
+        time: new Date().toLocaleString(),
+        likes: 0,
+        likedUsers: []
+    };
+
+    repliesData[postId].push(newReply);
+    saveRepliesDatabase(repliesData);
+    return newReply;
+}
+
+// 删除回复（后端API版本）
+function deleteReply(postId, replyId) {
+    return new Promise((resolve, reject) => {
+        fetch(`/api/replies/${replyId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络请求失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // 同步更新localStorage
+                    const repliesData = getRepliesDatabase();
+                    if (repliesData[postId]) {
+                        repliesData[postId] = repliesData[postId].filter(r => r.id !== replyId);
+                        saveRepliesDatabase(repliesData);
+                    }
+                    resolve(true);
+                } else {
+                    reject(new Error(data.error || '删除失败'));
+                }
+            })
+            .catch(error => {
+                // 如果后端API不可用，降级使用localStorage
+                console.warn('后端API不可用，使用localStorage数据:', error);
+                const repliesData = getRepliesDatabase();
+                if (repliesData[postId]) {
+                    repliesData[postId] = repliesData[postId].filter(r => r.id !== replyId);
+                    saveRepliesDatabase(repliesData);
+                }
+                resolve(true);
+            });
+    });
+}
+
+// 切换回复点赞状态
+function toggleReplyLike(postId, replyId, userId) {
+    const repliesData = getRepliesDatabase();
+
+    if (!repliesData[postId]) {
+        return { count: 0, liked: false };
+    }
+
+    const reply = repliesData[postId].find(r => r.id === replyId);
+    if (!reply) {
+        return { count: 0, liked: false };
+    }
+
+    const userIndex = reply.likedUsers.indexOf(userId);
+
+    if (userIndex > -1) {
+        // 取消点赞
+        reply.likedUsers.splice(userIndex, 1);
+        reply.likes--;
+    } else {
+        // 添加点赞
+        reply.likedUsers.push(userId);
+        reply.likes++;
+    }
+
+    saveRepliesDatabase(repliesData);
+    return {
+        count: reply.likes,
+        liked: userIndex === -1 // 返回当前状态：true表示已点赞
+    };
+}
+
+// 获取回复点赞数
+function getReplyLikes(postId, replyId) {
+    const repliesData = getRepliesDatabase();
+
+    if (repliesData[postId]) {
+        const reply = repliesData[postId].find(r => r.id === replyId);
+        return reply ? reply.likes : 0;
+    }
+
+    return 0;
+}
+
+// 检查用户是否已点赞回复
+function hasUserLikedReply(postId, replyId, userId) {
+    const repliesData = getRepliesDatabase();
+
+    if (repliesData[postId]) {
+        const reply = repliesData[postId].find(r => r.id === replyId);
+        return reply && reply.likedUsers && reply.likedUsers.includes(userId);
+    }
+
+    return false;
+}
+
+// ==================== 最高赞评论功能 ====================
+
+// 获取帖子的最高赞评论（前端localStorage版本）
+function getTopReply(postId) {
+    const replies = getPostReplies(postId);
+
+    if (replies.length === 0) {
+        return null;
+    }
+
+    // 按点赞数降序排序，取第一条
+    const sortedReplies = [...replies].sort((a, b) => {
+        const likesA = a.likes || 0;
+        const likesB = b.likes || 0;
+        return likesB - likesA;
+    });
+
+    return sortedReplies[0];
+}
+
+// 获取帖子的最高赞评论（后端API版本）
+function fetchTopReply(postId) {
+    return new Promise((resolve, reject) => {
+        fetch(`/api/posts/${encodeURIComponent(postId)}/top-reply`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络请求失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    resolve(data.data);
+                } else {
+                    reject(new Error(data.error || '获取数据失败'));
+                }
+            })
+            .catch(error => {
+                // 如果后端API不可用，降级使用localStorage
+                console.warn('后端API不可用，使用localStorage数据:', error);
+                resolve(getTopReply(postId));
+            });
+    });
+}
+
+// 渲染最高赞评论
+function renderTopReply(postId, container) {
+    if (!container) return;
+
+    // 获取最高赞评论
+    fetchTopReply(postId)
+        .then(topReply => {
+            if (!topReply) {
+                // 没有评论时隐藏容器，不显示任何内容
+                container.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            // 显示容器
+            container.style.display = 'block';
+            container.innerHTML = '';
+
+            // 创建最高赞评论元素
+            const topReplyEl = document.createElement('div');
+            topReplyEl.className = 'top-reply';
+            topReplyEl.innerHTML = `
+                <div class="top-reply-header">
+                    <span class="top-reply-badge">🔥 点赞最高</span>
+                </div>
+                <div class="top-reply-content">
+                    <div class="top-reply-author">${topReply.author}</div>
+                    <div class="top-reply-text">${topReply.content}</div>
+                    <div class="top-reply-footer">
+                        <span class="top-reply-time">${topReply.time}</span>
+                        <span class="top-reply-likes">❤️ ${topReply.likes}</span>
+                    </div>
+                </div>
+            `;
+
+            // 添加平滑加载动画
+            topReplyEl.style.opacity = '0';
+            topReplyEl.style.transform = 'translateY(10px)';
+            topReplyEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+            container.appendChild(topReplyEl);
+
+            // 触发动画
+            setTimeout(() => {
+                topReplyEl.style.opacity = '1';
+                topReplyEl.style.transform = 'translateY(0)';
+            }, 100);
+        })
+        .catch(error => {
+            console.error('获取最高赞评论失败:', error);
+            // 静默失败，不显示任何错误信息
+            container.style.display = 'none';
+            container.innerHTML = '';
+        });
+}
